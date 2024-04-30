@@ -1,0 +1,9 @@
+aiofiles
+Pillow
+psutil
+pyinstaller
+pyinstaller-hooks-contrib
+PySide6==6.6.3.1
+requests
+bs4
+pyperclip

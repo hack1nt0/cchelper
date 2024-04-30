@@ -1,0 +1,16 @@
+{
+    // "terminal.integrated.cwd": "${fileDirname}",
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/cchelper"
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.formatting.provider": "none",
+    "python.testing.pytestArgs": [
+        "test"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": false,
+    // "python.formatting.provider": "none",
+}

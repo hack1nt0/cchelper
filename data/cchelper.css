@@ -1,0 +1,59 @@
+QTableView {
+    font: 12px "JetBrains Mono";
+}
+
+QPlainTextEdit {
+    font-size: 12px;
+    font-family: 'JetBrains Mono', 'PT Mono', 'Courier New';
+    /* color: white;
+    background-color: rgb(2,4,94);
+    selection-background-color: rgb(5,128,128);
+    selection-color: black; */
+}
+
+QTableView::item:focus {
+    /* background-color: rgb(5,128,128); */
+    /* color: black; */
+    /* background-color: rgb(5,128,128);; */
+    background-color: darkblue;
+    color: white;
+}
+
+QToolButton:hover {
+    background: blue;
+    color: yellow;
+}
+
+QToolButton:pressed {
+    background: blue;
+    color: yellow;
+}
+
+QToolButton:focus {
+    background: blue;
+    color: yellow;
+}
+
+/* QToolButton:checked {
+    color: yellow;
+    background-color: darkblue;
+} */
+
+QToolButton[objectName="arxivButton"]:hover {
+    background-color: rgb(0,255,0);
+}
+
+QToolButton[objectName="arxivButton"]:pressed {
+    background-color: rgb(0,255,0);
+}
+
+QToolButton[objectName="delButton"]:hover {
+    background-color: red;
+}
+
+QToolButton[objectName="delButton"]:pressed {
+    background-color: red;
+}
+
+
+

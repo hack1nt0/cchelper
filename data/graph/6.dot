@@ -1,0 +1,78 @@
+digraph {
+	1 [label=<val=30697534<BR/>sum=30697534<BR/>count=1<BR/>size=1<BR/><BR/>height=1<BR/>>]
+	2 [label=<val=31943484<BR/>sum=235152325<BR/>count=1<BR/>size=3<BR/><BR/>height=2<BR/>>]
+	3 [label=<val=172511307<BR/>sum=172511307<BR/>count=1<BR/>size=1<BR/><BR/>height=1<BR/>>]
+	2 -> 1
+	2 -> 3
+	4 [label=<val=182475492<BR/>sum=885373609<BR/>count=1<BR/>size=6<BR/><BR/>height=3<BR/>>]
+	5 [label=<val=205055752<BR/>sum=467745792<BR/>count=1<BR/>size=2<BR/><BR/>height=2<BR/>>]
+	6 [label=<val=262690040<BR/>sum=262690040<BR/>count=1<BR/>size=1<BR/><BR/>height=1<BR/>>]
+	5 -> 6
+	4 -> 2
+	4 -> 5
+	7 [label=<val=278921893<BR/>sum=2609910885<BR/>count=1<BR/>size=11<BR/><BR/>height=4<BR/>>]
+	8 [label=<val=309561915<BR/>sum=309561915<BR/>count=1<BR/>size=1<BR/><BR/>height=1<BR/>>]
+	9 [label=<val=331987298<BR/>sum=1445615383<BR/>count=1<BR/>size=4<BR/><BR/>height=3<BR/>>]
+	10 [label=<val=381234067<BR/>sum=381234067<BR/>count=1<BR/>size=1<BR/><BR/>height=1<BR/>>]
+	11 [label=<val=422832103<BR/>sum=804066170<BR/>count=1<BR/>size=2<BR/><BR/>height=2<BR/>>]
+	11 -> 10
+	9 -> 8
+	9 -> 11
+	7 -> 4
+	7 -> 9
+	12 [label=<val=424776357<BR/>sum=6870203685<BR/>count=1<BR/>size=20<BR/><BR/>height=5<BR/>>]
+	13 [label=<val=427482847<BR/>sum=427482847<BR/>count=1<BR/>size=1<BR/><BR/>height=1<BR/>>]
+	14 [label=<val=430397101<BR/>sum=1312144427<BR/>count=1<BR/>size=3<BR/><BR/>height=2<BR/>>]
+	15 [label=<val=454264479<BR/>sum=454264479<BR/>count=1<BR/>size=1<BR/><BR/>height=1<BR/>>]
+	14 -> 13
+	14 -> 15
+	16 [label=<val=476006883<BR/>sum=3835516443<BR/>count=1<BR/>size=8<BR/><BR/>height=4<BR/>>]
+	17 [label=<val=484436691<BR/>sum=484436691<BR/>count=1<BR/>size=1<BR/><BR/>height=1<BR/>>]
+	18 [label=<val=502834015<BR/>sum=987270706<BR/>count=1<BR/>size=2<BR/><BR/>height=2<BR/>>]
+	18 -> 17
+	19 [label=<val=528426178<BR/>sum=2047365133<BR/>count=1<BR/>size=4<BR/><BR/>height=3<BR/>>]
+	20 [label=<val=531668249<BR/>sum=531668249<BR/>count=1<BR/>size=1<BR/><BR/>height=1<BR/>>]
+	19 -> 18
+	19 -> 20
+	16 -> 14
+	16 -> 19
+	12 -> 7
+	12 -> 16
+	21 [label=<val=540290782<BR/>sum=20891906547<BR/>count=1<BR/>size=38<BR/><BR/>height=6<BR/>>]
+	22 [label=<val=544740615<BR/>sum=544740615<BR/>count=1<BR/>size=1<BR/><BR/>height=1<BR/>>]
+	23 [label=<val=593031831<BR/>sum=1137772446<BR/>count=1<BR/>size=2<BR/><BR/>height=2<BR/>>]
+	23 -> 22
+	24 [label=<val=614555267<BR/>sum=3664433047<BR/>count=1<BR/>size=6<BR/><BR/>height=3<BR/>>]
+	25 [label=<val=624127520<BR/>sum=624127520<BR/>count=1<BR/>size=1<BR/><BR/>height=1<BR/>>]
+	26 [label=<val=630672979<BR/>sum=1912105334<BR/>count=1<BR/>size=3<BR/><BR/>height=2<BR/>>]
+	27 [label=<val=657304835<BR/>sum=657304835<BR/>count=1<BR/>size=1<BR/><BR/>height=1<BR/>>]
+	26 -> 25
+	26 -> 27
+	24 -> 23
+	24 -> 26
+	28 [label=<val=756771003<BR/>sum=13481412080<BR/>count=1<BR/>size=17<BR/><BR/>height=5<BR/>>]
+	29 [label=<val=773181717<BR/>sum=1557668354<BR/>count=1<BR/>size=2<BR/><BR/>height=2<BR/>>]
+	30 [label=<val=784486637<BR/>sum=784486637<BR/>count=1<BR/>size=1<BR/><BR/>height=1<BR/>>]
+	29 -> 30
+	31 [label=<val=836653656<BR/>sum=3244693077<BR/>count=1<BR/>size=4<BR/><BR/>height=3<BR/>>]
+	32 [label=<val=850371067<BR/>sum=850371067<BR/>count=1<BR/>size=1<BR/><BR/>height=1<BR/>>]
+	31 -> 29
+	31 -> 32
+	33 [label=<val=931778211<BR/>sum=9060208030<BR/>count=1<BR/>size=10<BR/><BR/>height=4<BR/>>]
+	34 [label=<val=958601327<BR/>sum=1932536301<BR/>count=1<BR/>size=2<BR/><BR/>height=2<BR/>>]
+	35 [label=<val=973934974<BR/>sum=973934974<BR/>count=1<BR/>size=1<BR/><BR/>height=1<BR/>>]
+	34 -> 35
+	36 [label=<val=974275914<BR/>sum=4883736742<BR/>count=1<BR/>size=5<BR/><BR/>height=3<BR/>>]
+	37 [label=<val=983205479<BR/>sum=1976924527<BR/>count=1<BR/>size=2<BR/><BR/>height=2<BR/>>]
+	38 [label=<val=993719048<BR/>sum=993719048<BR/>count=1<BR/>size=1<BR/><BR/>height=1<BR/>>]
+	37 -> 38
+	36 -> 34
+	36 -> 37
+	33 -> 31
+	33 -> 36
+	28 -> 24
+	28 -> 33
+	21 -> 12
+	21 -> 28
+{rank=source;21}
+}

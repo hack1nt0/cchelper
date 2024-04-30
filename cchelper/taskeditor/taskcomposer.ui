@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TaskComposer</class>
+ <widget class="QMainWindow" name="TaskComposer">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>633</width>
+    <height>587</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">cchelper</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QToolButton" name="TCButton">
+        <property name="text">
+         <string>Test Cases</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="buildButton">
+        <property name="text">
+         <string>4</string>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonIconOnly</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="runButton">
+        <property name="text">
+         <string>5</string>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonIconOnly</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="stopButton">
+        <property name="text">
+         <string>T</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="submitButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>6</string>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonIconOnly</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="CodeEditor" name="SEditor">
+        <attribute name="title">
+         <string>Solver</string>
+        </attribute>
+       </widget>
+       <widget class="CodeEditor" name="GEditor">
+        <attribute name="title">
+         <string>Generator</string>
+        </attribute>
+       </widget>
+       <widget class="CodeEditor" name="JEditor">
+        <attribute name="title">
+         <string>Jurger</string>
+        </attribute>
+       </widget>
+      </widget>
+      <widget class="QTabWidget" name="tabWidget_2">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="ChartViewer" name="CViewer">
+        <attribute name="title">
+         <string>CViewer</string>
+        </attribute>
+       </widget>
+       <widget class="VerdictBrowser" name="VBrowser">
+        <attribute name="title">
+         <string>Verdict Table</string>
+        </attribute>
+       </widget>
+       <widget class="FileViewer" name="FViewer">
+        <attribute name="title">
+         <string>FViewer</string>
+        </attribute>
+       </widget>
+       <widget class="GViewer" name="GViewer">
+        <attribute name="title">
+         <string>GViewer</string>
+        </attribute>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="sizeGripEnabled">
+    <bool>false</bool>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CodeEditor</class>
+   <extends>QWidget</extends>
+   <header location="global">cchelper.fileeditor.codeeditor</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ChartViewer</class>
+   <extends>QWidget</extends>
+   <header location="global">cchelper.chartviewer.chartviewer</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FileViewer</class>
+   <extends>QWidget</extends>
+   <header location="global">cchelper.fileviewer.fileviewer</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>GViewer</class>
+   <extends>QWidget</extends>
+   <header location="global">cchelper.gviewer.gviewer</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>VerdictBrowser</class>
+   <extends>QWidget</extends>
+   <header location="global">cchelper.verdictbrowser.verdictbrowser</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
