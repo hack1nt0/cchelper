@@ -61,8 +61,12 @@ class Process:
     def poll(self):
         return self.p.poll()
 
-    def terminate(self):
+    def terminate(self): #TODO
+        self.p.stdin.close() # Necessary to terminal children processes of docker exec.
+        self.p.stdout.close()
+        self.p.stderr.close()
         self.p.terminate()
+        # self.p.kill()
 
     @property
     def pid(self):

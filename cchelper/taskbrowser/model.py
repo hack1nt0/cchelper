@@ -38,7 +38,7 @@ class TaskModel(QAbstractTableModel):
             case Qt.ItemDataRole.DisplayRole | Qt.ItemDataRole.ToolTipRole:
                 match col:
                     case 0:
-                        ret = "\n".join(dat.name.split("/"))
+                        ret = "\n".join(dat.name.split(os.sep))
                     case 1:
                         ret = f"comparator: {dat.comp_type.value}\ncpu <= {dat.cpu}\nmem <= {dat.mem}\ninteractive: {dat.interactive}\nqry <= {dat.qry}"
                     case 2:

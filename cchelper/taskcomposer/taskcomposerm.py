@@ -71,8 +71,8 @@ class TaskComposerM(QMainWindow, Ui_TaskComposerM):
                 self.helpButton.setEnabled(T)
                 self.settingButton.setEnabled(T)
                 self.taskBrowser.setEnabled(T)
-                self.terminal.new_shell(conf.tasks_dir())
-                os.chdir(conf.tasks_dir())
+                self.terminal.new_shell('/code')
+                os.chdir(conf.project_dir)
                 if self.task is not None:
                     self.task.save()
                 self.solveButton.setStyleSheet('')
@@ -85,7 +85,7 @@ class TaskComposerM(QMainWindow, Ui_TaskComposerM):
                         w.setEnabled(T)
                     self.testBrowser.set_task(task)
                     self.verdictBrowser.set_task(task)
-                    self.terminal.new_shell(task.dir())
+                    self.terminal.new_shell(f"/code/tasks/{task.name}")
                     os.chdir(task.dir())
                 match task.status:
                     case TS.SOLVED:

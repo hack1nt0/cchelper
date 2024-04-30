@@ -116,7 +116,7 @@ for _ in range(n):
                 "Dynamic Programming",
                 "Data Structure",
                 "Binary Search",
-                "Backtracking"
+                "Backtracking",
             ],
             "bytes_per_page": 100000,
             "bytes_per_cell": 1000,
@@ -143,9 +143,9 @@ for _ in range(n):
     @property
     def project_dir(self) -> str:
         return self.dat["project_dir"]
-    
+
     def tasks_dir(self, *args) -> str:
-        return os.path.join(self.project_dir, 'tasks', *map(str, args))
+        return os.path.join(self.project_dir, "tasks", *map(str, args))
 
     def working_dir(self, *args) -> str:
         return os.path.join(self.project_dir, "cchelper", *map(str, args))
@@ -361,35 +361,18 @@ class File:
         return os.path.splitext(self.path)[1]
 
     @property
+    def prefix(self) -> str:
+        return os.path.splitext(self.path)[0]
+
+    @property
     def compile_cmd(self) -> str:
-        prefix, suffix = os.path.splitext(self.path)
-        prefix_exe = conf.working_dir(
-            "dist", os.path.splitext(os.path.basename(self.path))[0]
-        )
-        lang = [lang for lang in conf.languages if lang.suffix == suffix]
-        if not lang:
-            return
-        lang = lang[0]
-        if conf.build_debug:
-            cmd = lang.debug.format(prefix_exe, prefix) if lang.debug else None
-        else:
-            cmd = lang.release.format(prefix_exe, prefix) if lang.release else None
-        return self.format_cmd(cmd)
+        #TODO -it : ERR the input device is not a TTY
+        ret = f"docker exec dev bash compile{self.suffix}.sh /code/tasks/{self.taskname} {self.path} {self.executable} {1 if conf.build_debug else 0}"
+        return ret
 
     @property
     def execute_cmd(self) -> str:
-        prefix = conf.working_dir(
-            "dist", os.path.splitext(os.path.basename(self.path))[0]
-        )
-        if self.compile_cmd is None:
-            prefix = conf.working_dir(os.path.splitext(os.path.basename(self.path))[0])
-        suffix = os.path.splitext(self.path)[1]
-        lang = [lang for lang in conf.languages if lang.suffix == suffix]
-        if not lang:
-            return
-        lang = lang[0]
-        cmd = lang.run.format(prefix)
-        return self.format_cmd(cmd)
+        return f"docker exec -i dev bash execute{self.suffix}.sh /code/tasks/{self.taskname} {self.executable}"
 
     def format_cmd(self, cmd: str) -> str | List[str] | None:
         if cmd is None:
@@ -398,10 +381,7 @@ class File:
 
     @property
     def executable(self) -> str:
-        prefix = conf.working_dir(
-            "dist", os.path.splitext(os.path.basename(self.path))[0]
-        )
-        return prefix + ".exe"
+        return self.prefix + ".exe"
 
 
 class TokenFile(File):
@@ -492,7 +472,8 @@ class Test:
 
     def remove(self):
         shutil.rmtree(os.path.dirname(self.input.path))
-        
+
+
 import collections
 
 
@@ -591,4 +572,3 @@ class Task:
             return F
         else:
             return T
-            

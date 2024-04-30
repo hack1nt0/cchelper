@@ -99,8 +99,9 @@ class TerminalWidget(QWidget):
     def set_pty(
         self,
         ip="localhost",
-        username="dy",
-        password="6666",
+        username="root",
+        password="root",
+        port=10022,
         rows=24,
         cols=80,
     ):
@@ -108,7 +109,7 @@ class TerminalWidget(QWidget):
         self.cols = cols
         self.ssh_client = paramiko.SSHClient()
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.ssh_client.connect(ip, username=username, password=password)
+        self.ssh_client.connect(ip, username=username, password=password, port=port)
         # t = self.ssh_client.get_transport()
         # t.window_size = 2147483647
         # t.packetizer.REKEY_BYTES = pow(2, 40)
@@ -293,7 +294,7 @@ class TerminalWidget(QWidget):
         modifiers = event.modifiers()
         ctrl = modifiers == Qt.KeyboardModifier.ControlModifier
         if ctrl and key == Qt.Key.Key_V:
-            self.write(clipboard.paste().encode())
+            self.write(QGuiApplication.clipboard().text().encode())
             return
         elif text:
             self.write(text.encode())

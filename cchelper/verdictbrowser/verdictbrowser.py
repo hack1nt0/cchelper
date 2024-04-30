@@ -25,7 +25,7 @@ class VerdictBrowser(QWidget, Ui_VerdictBrowser):
         self.view.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.ResizeToContents
         )
-        for col in ["cmd", "input", "actual", "answer", "chat"]:
+        for col in ["cmd", "stderr",]:
             idx = self.model.cols.index(col)
             self.view.horizontalHeader().setSectionResizeMode(
                 idx, QHeaderView.ResizeMode.Stretch

@@ -29,11 +29,14 @@ class BuildState(QState):
         global_stopflag.clear()
 
         def files():
+            self.task.solver.taskname = self.task.name
             yield self.task.solver
             for test in self.task.tests:
                 if test.input_type == IT.GENERATOR:
+                    test.input.taskname = self.task.name
                     yield test.input
                 if test.answer_type == AT.JURGER:
+                    test.answer.taskname = self.task.name
                     yield test.answer
 
         for file in files():
@@ -45,9 +48,9 @@ class BuildState(QState):
                 stderr=File(self.task.verdict_dir(vid, "stderr.txt")).create(),
             )
             self.task.verdicts.append(verdict)
-            if len(file) == 0:  # TODO file empty
-                verdict.status = VS.COMPILATION_SKP
-                continue
+            # if len(file) == 0:  # TODO file empty
+            #     verdict.status = VS.COMPILATION_SKP
+            #     continue
             task = self.threadpool.submit(
                 TestService.compile_one,
                 verdict=verdict,

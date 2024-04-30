@@ -11,7 +11,7 @@
             "name": "C++",
             "suffix": ".cpp",
             "template": "\n#include \"debug.h\"\n\nvoid solve(int it) {}\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(&cout);\n    int n; cin >> n;\n    for (int i = 0; i < n; ++i) {\n        int x, y;\n        cin >> x >> y;\n        cout << x + y << '\\n';\n    }\n    return 0;\n}\n",
-            "debug": "/usr/bin/c++ -I/Users/dy/cc/include -std=c++17 -g -Wall -DDEBUG -fsanitize=address -fsanitize=undefined -o {}.exe {}.cpp",
+            "debug": "c++ -Iinclude -std=c++17 -g -Wall -DDEBUG -fsanitize=address -fsanitize=undefined -o {}.exe {}.cpp",
             "release": "/usr/bin/c++ -I/Users/dy/cc/include -std=c++17 -O2 -o {}.exe {}.cpp",
             "run": "{}.exe"
         },

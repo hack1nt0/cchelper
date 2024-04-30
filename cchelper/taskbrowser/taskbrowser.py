@@ -236,8 +236,7 @@ class TaskBrowser(QWidget, Ui_TaskBrowser):
             return ret
 
         def relative(x: str, task: Task):
-            y = f"/Users/dy/cchelper/data/stash/{task.name}/"
-            return os.path.relpath(x, y) if x.startswith(y) else x
+            return x
 
         solver_pattern = re.compile("^(sol|solver|solution|[a-z])$")
         for root, dns, fns in os.walk(conf.tasks_dir()):
