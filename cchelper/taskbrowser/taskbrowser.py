@@ -236,6 +236,8 @@ class TaskBrowser(QWidget, Ui_TaskBrowser):
             return ret
 
         def relative(x: str, task: Task):
+            if x.startswith('/Users/dy/cc'):
+                x = os.path.relpath(x, os.path.join('/Users/dy/cc', task.name))
             return x
 
         solver_pattern = re.compile("^(sol|solver|solution|[a-z])$")
@@ -336,6 +338,7 @@ class TaskBrowser(QWidget, Ui_TaskBrowser):
                 logger.info(f"Successfully deleted task: {task}.")
             self.view.setFocus()
 
+        
     def closeEvent(self, event: QCloseEvent) -> None:
         if self.ccListener:
             self.ccListener.shutdown()

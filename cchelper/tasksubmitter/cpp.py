@@ -15,39 +15,37 @@ def extract_includes(cmd):
 
 
 def preprocess(
-    fn,
+    file: File,
 ):
-    PP_CMD = File(fn).compile_cmd
-    if isinstance(PP_CMD, str):
-        PP_CMD = PP_CMD.split(' ')
-    INCLUDES = extract_includes(PP_CMD)
-    PP_CMD = [PP_CMD[0]]
-    for I in INCLUDES:
-        PP_CMD.append(f"-I{I}")
-    PP_CMD += ["-E", "-x", "c++", "-"]
-    logger.debug(' '.join(PP_CMD))
+    # PP_CMD = File(fn).compile_cmd
+    # if isinstance(PP_CMD, str):
+    #     PP_CMD = PP_CMD.split(' ')
+    # INCLUDES = extract_includes(PP_CMD)
+    # PP_CMD = [PP_CMD[0]]
+    # for I in INCLUDES:
+    #     PP_CMD.append(f"-I{I}")
+    # PP_CMD += ["-E", "-x", "c++", "-"]
+    # logger.debug(' '.join(PP_CMD))
+    PP_CMD = "docker exec -i dev c++ -I/code/include -E -x c++ -"
+    PP_CMD = PP_CMD.split(' ')
     lines = []
-    std_headers = set()
+    std_headers = {'bits/stdc++.h'}
     import re
 
     pat_header = re.compile(r'[ \t]*#include[ \t]*["<]([\w\\/\._]+)[>"]')
 
-    def concat(fn):
+    def concat(fn: str):
         with open(fn, "r") as f:
             for line in f.readlines():
                 m = pat_header.match(line)
                 if m:
                     header = m.group(1)
-                    is_custome_header = False
-                    for i in INCLUDES:
-                        nfn = os.path.join(i, *header.split("/"))
-                        if os.path.exists(nfn) and os.path.isfile(nfn):
-                            concat(nfn)
-                            is_custome_header = True
-                            break
+                    nfn = os.path.join(conf.project_dir, 'include', header)
+                    if os.path.exists(nfn) and os.path.isfile(nfn):
+                        concat(nfn)
                     # std headers
-                    if is_custome_header == False:
-                        std_headers.add(header)
+                    # if is_custome_header == False:
+                    #     std_headers.add(header)
                 else:
                     line = line.replace('\t', ' '*4)
                     lines.append(line)
@@ -55,7 +53,7 @@ def preprocess(
                     if not line.endswith("\n"):
                         lines.append("\n")
 
-    concat(fn)
+    concat(file.path)
 
     # macro substitution (aka. after preprocessing)
     p = Popen(PP_CMD, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)

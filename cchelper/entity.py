@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 import time
 import enum
 import os
-from .db import db
+# from .db import db
 from typing import List, Tuple, Dict, Any
 import json
 import glob
@@ -53,16 +53,16 @@ class Configuration:
         self.reload()
 
     def reload(self):
-        with open(self.fn, "r") as r:
-            self.dat = json.load(r)
+        if not os.path.exists(self.fn):
+            self.reset()
+        else:
+            with open(self.fn, "r") as r:
+                self.dat = json.load(r)
 
     def reset(self):  # restore to defaults
         self.dat = {
-            "project_dir": "/Users/dy/cc",
+            "project_dir": "/Users/dy/gits/cc",
             "solver": "Solver.cpp",
-            "generator": "Generator.py",
-            "jurger": "Jurger.cpp",
-            "editor": "/usr/local/bin/code",
             "parallel": 1,
             "refresh_rate": 10,
             "languages": [
@@ -86,9 +86,6 @@ int main() {
     return 0;
 }
 """,
-                    "debug": r"/usr/bin/c++ -I/Users/dy/cc/include -std=c++20 -g -Wall -DDEBUG -fsanitize=address -fsanitize=undefined -o {}.exe {}.cpp",
-                    "release": r"/usr/bin/c++ -I/Users/dy/cc/include -std=c++20 -O2 -Wall -o {}.exe {}.cpp",
-                    "run": r"{}.exe",
                 },
                 {
                     "name": "Python",
@@ -102,10 +99,8 @@ for _ in range(n):
     y = random.randint(0, 10)
     print(x, y)
 """,
-                    "debug": "",
-                    "release": "",
-                    "run": r"/opt/homebrew/bin/python3 {}.py",
                 },
+                {"name": "TXT", "suffix": ".txt", "template": ""},
             ],
             "tags": [
                 "*",
@@ -132,7 +127,7 @@ for _ in range(n):
             "log_level": "DEBUG",
             "exe_dump_delay": 1,
             "exe_warm_delay": 2,
-            "font": None,
+            "font": "JetBrains Mono,12",
         }
         self.save()
 
@@ -271,6 +266,16 @@ class File:
             with open(self.path, "w") as w:
                 pass
         return self
+    
+    def write(self, o):
+        if isinstance(o, File):
+            with open(self.path, 'w') as w:
+                for line in open(o):
+                    w.write(line)
+        else:
+            assert isinstance(o, str)
+            with open(self.path, 'w') as w:
+                w.write(o)
 
     def __iadd__(self, value: bytes | str):
         if value is None:
@@ -366,13 +371,26 @@ class File:
 
     @property
     def compile_cmd(self) -> str:
-        #TODO -it : ERR the input device is not a TTY
-        ret = f"docker exec dev bash compile{self.suffix}.sh /code/tasks/{self.taskname} {self.path} {self.executable} {1 if conf.build_debug else 0}"
+        # TODO -it : ERR the input device is not a TTY
+        # ret = f"docker exec dev bash compile{self.suffix}.sh /code/tasks/{self.taskname} {self.path} {self.executable} {1 if conf.build_debug else 0}"
+        ret = None
+        match self.suffix:
+            case ".cpp":
+                if conf.build_debug:
+                    ret = f"docker exec dev bash -c 'cd /code/tasks/{self.taskname}; c++ -I/code/include -std=c++17 -g -Wall -DDEBUG -fsanitize=address -fsanitize=undefined -o {self.executable} {self.path}'"
+                else:
+                    ret = f"docker exec dev bash -c 'cd /code/tasks/{self.taskname}; c++ -I/code/include -std=c++17 -O2 -o {self.executable} {self.path}'"
         return ret
 
     @property
     def execute_cmd(self) -> str:
-        return f"docker exec -i dev bash execute{self.suffix}.sh /code/tasks/{self.taskname} {self.executable}"
+        ret = None
+        match self.suffix:
+            case ".cpp":
+                ret = f"docker exec -i dev bash -c 'cd /code/tasks/{self.taskname}; ./{self.executable}'"
+            case ".py":
+                ret = f"docker exec -i dev bash -c 'cd /code/tasks/{self.taskname}; python3 {self.path}'"
+        return ret
 
     def format_cmd(self, cmd: str) -> str | List[str] | None:
         if cmd is None:
@@ -471,7 +489,10 @@ class Test:
     checked: bool = True
 
     def remove(self):
-        shutil.rmtree(os.path.dirname(self.input.path))
+        try:
+            shutil.rmtree(os.path.dirname(self.input.path))
+        except:
+            pass
 
 
 import collections
@@ -572,3 +593,36 @@ class Task:
             return F
         else:
             return T
+
+    def new_test(self, old: Test = None) -> Test:
+        id = max(map(lambda t: t.id, self.tests)) + 1 if self.tests else 1
+        if old is not None:
+            new = Test(
+                id=id,
+                status=old.status,
+                input_type=old.input_type,
+                answer_type=old.answer_type,
+            )
+            if isinstance(old.input, File):
+                new.input = File(self.test_dir(id, os.path.basename(old.input.path))).create()
+                new.input.write(old.input)
+            if isinstance(old.input, str):
+                new.input = File(self.test_dir(id, 'Input.txt')).create()
+                new.input.write(old.input)
+            if isinstance(old.answer, File):
+                new.answer = File(self.test_dir(id, os.path.basename(old.answer.path))).create()
+                new.answer.write(old.answer)
+            if isinstance(old.answer, str):
+                new.answer = File(self.test_dir(id, 'Answer.txt')).create()
+                new.answer.write(old.answer)
+        else:
+            new = Test(
+                id=id,
+                status=VS.QUE,
+                input_type=IT.MANUAL,
+                answer_type=IT.MANUAL,
+                input=File(self.test_dir(id, 'Input.txt')).create(),
+                answer=File(self.test_dir(id, 'Answer.txt')).create(),
+            )
+        # self.tests.append(new)
+        return new

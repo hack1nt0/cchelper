@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'langform.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.6.1
+## Created by: Qt User Interface Compiler version 6.6.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -62,37 +62,6 @@ class Ui_LangForm(object):
 
         self.formLayout.setWidget(2, QFormLayout.FieldRole, self.templateTextEdit)
 
-        self.debugLabel = QLabel(LangForm)
-        self.debugLabel.setObjectName(u"debugLabel")
-
-        self.formLayout.setWidget(3, QFormLayout.LabelRole, self.debugLabel)
-
-        self.debugLineEdit = QLineEdit(LangForm)
-        self.debugLineEdit.setObjectName(u"debugLineEdit")
-
-        self.formLayout.setWidget(3, QFormLayout.FieldRole, self.debugLineEdit)
-
-        self.releaseLabel = QLabel(LangForm)
-        self.releaseLabel.setObjectName(u"releaseLabel")
-
-        self.formLayout.setWidget(4, QFormLayout.LabelRole, self.releaseLabel)
-
-        self.releaseLineEdit = QLineEdit(LangForm)
-        self.releaseLineEdit.setObjectName(u"releaseLineEdit")
-
-        self.formLayout.setWidget(4, QFormLayout.FieldRole, self.releaseLineEdit)
-
-        self.runLabel = QLabel(LangForm)
-        self.runLabel.setObjectName(u"runLabel")
-
-        self.formLayout.setWidget(5, QFormLayout.LabelRole, self.runLabel)
-
-        self.runLineEdit = QLineEdit(LangForm)
-        self.runLineEdit.setObjectName(u"runLineEdit")
-        self.runLineEdit.setPlaceholderText(u"NOT NULL")
-
-        self.formLayout.setWidget(5, QFormLayout.FieldRole, self.runLineEdit)
-
 
         self.verticalLayout.addLayout(self.formLayout)
 
@@ -115,9 +84,6 @@ class Ui_LangForm(object):
         self.nameLabel.setText(QCoreApplication.translate("LangForm", u"Name:", None))
         self.suffixLabel.setText(QCoreApplication.translate("LangForm", u"Suffix:", None))
         self.templateLabel.setText(QCoreApplication.translate("LangForm", u"Template:", None))
-        self.debugLabel.setText(QCoreApplication.translate("LangForm", u"Debug:", None))
-        self.releaseLabel.setText(QCoreApplication.translate("LangForm", u"Release:", None))
-        self.runLabel.setText(QCoreApplication.translate("LangForm", u"Run:", None))
         pass
     # retranslateUi
 

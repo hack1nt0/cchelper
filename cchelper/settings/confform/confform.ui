@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>441</width>
-    <height>434</height>
+    <width>435</width>
+    <height>372</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -69,60 +69,16 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string> + </string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="GLineEdit">
-         <property name="text">
-          <string>Generator.py</string>
-         </property>
-         <property name="placeholderText">
-          <string>Generator</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string> + </string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="JLineEdit">
-         <property name="text">
-          <string>Jurger.cpp</string>
-         </property>
-         <property name="placeholderText">
-          <string>Jurger</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="editorLabel">
-       <property name="text">
-        <string>Ext. Editor:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="editorEdit"/>
-     </item>
-     <item row="3" column="0">
       <widget class="QLabel" name="maxBitsLabel">
        <property name="text">
         <string>Table:</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
+     <item row="2" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QSpinBox" name="bytesPerCellSpinBox">
@@ -158,14 +114,14 @@
        </item>
       </layout>
      </item>
-     <item row="4" column="0">
+     <item row="3" column="0">
       <widget class="QLabel" name="initialRowsLabel">
        <property name="text">
         <string>File Viewer:</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="3" column="1">
       <widget class="QSpinBox" name="bytesPerPageSpinBox">
        <property name="suffix">
         <string notr="true"> bytes/page</string>
@@ -181,14 +137,14 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
+     <item row="4" column="0">
       <widget class="QLabel" name="pipeLabel">
        <property name="text">
         <string>Pipe:</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="4" column="1">
       <widget class="QSpinBox" name="bytesPerReadSpinBox">
        <property name="suffix">
         <string notr="true"> bytes/read</string>
@@ -201,14 +157,14 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
+     <item row="5" column="0">
       <widget class="QLabel" name="buildOptsLabel">
        <property name="text">
         <string>Build Mode:</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="1">
+     <item row="5" column="1">
       <widget class="QGroupBox" name="buildModeGroupBox">
        <property name="flat">
         <bool>true</bool>
@@ -249,28 +205,28 @@
        </layout>
       </widget>
      </item>
-     <item row="7" column="1">
+     <item row="6" column="1">
       <widget class="QCheckBox" name="buildAsNeedCheckBox">
        <property name="text">
         <string>Build as need</string>
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
+     <item row="7" column="1">
       <widget class="QCheckBox" name="runinshellCheckBox">
        <property name="text">
         <string>Run in shell mode</string>
        </property>
       </widget>
      </item>
-     <item row="9" column="0">
+     <item row="8" column="0">
       <widget class="QLabel" name="dumpWarmUpLabel">
        <property name="text">
         <string>Dump/Warm:</string>
        </property>
       </widget>
      </item>
-     <item row="9" column="1">
+     <item row="8" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QSpinBox" name="exeDumpSpinBox">
@@ -294,14 +250,14 @@
        </item>
       </layout>
      </item>
-     <item row="10" column="0">
+     <item row="9" column="0">
       <widget class="QLabel" name="parallelLabel">
        <property name="text">
         <string>Parallels:</string>
        </property>
       </widget>
      </item>
-     <item row="10" column="1">
+     <item row="9" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
         <widget class="QSpinBox" name="parallelSpinBox">
@@ -331,14 +287,14 @@
        </item>
       </layout>
      </item>
-     <item row="11" column="0">
+     <item row="10" column="0">
       <widget class="QLabel" name="fontLabel">
        <property name="text">
         <string>Font:</string>
        </property>
       </widget>
      </item>
-     <item row="11" column="1">
+     <item row="10" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <property name="spacing">
         <number>0</number>
@@ -354,16 +310,6 @@
         </widget>
        </item>
       </layout>
-     </item>
-     <item row="12" column="0">
-      <widget class="QLabel" name="graphvizLabel">
-       <property name="text">
-        <string>Graphviz:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="12" column="1">
-      <widget class="QLineEdit" name="graphvizLineEdit"/>
      </item>
     </layout>
    </item>

@@ -2,11 +2,10 @@ from cchelper import *
 from .codesubmit_ui import Ui_CodeSubmitter
 import tempfile
 from subprocess import Popen, PIPE
-import pyperclip as clipboard
 import cchelper.tasksubmitter.cpp as cpp
 
 class CodeSubmitter(QDialog, Ui_CodeSubmitter):
-    def __init__(self, file: File, parent: QWidget) -> None:
+    def __init__(self, parent: QWidget) -> None:
         super().__init__(parent, Qt.WindowType.Dialog)
         self.setupUi(self)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
@@ -23,18 +22,6 @@ class CodeSubmitter(QDialog, Ui_CodeSubmitter):
         self.ppTextEdit.setReadOnly(True)
         self.errTextEdit.setReadOnly(True)
 
-        self.final = None
-        self.path = file.path
-        if self.path.endswith('.cpp'):
-            self.final, pp = cpp.preprocess(self.path)
-            pp = ''.join(pp)
-            self.ppTextEdit.setPlainText(pp)
-        else:
-            with open(self.path, 'r') as s:
-                self.final = s.readlines()
-            # self.removeMainButton.setEnabled(F)
-        self.finalTextEdit.setPlainText(''.join(self.final))
-
         self.removeMainButton.setShortcut("Alt+R")
         self.removeMainButton.clicked.connect(self.remove_main)
 
@@ -48,10 +35,25 @@ class CodeSubmitter(QDialog, Ui_CodeSubmitter):
         self.switch_tab_key.activated.connect(self.switch_tab)
         self.tabWidget.setCurrentIndex(self.current_tab_idx)
 
-    def switch_tab(self):
-        self.current_tab_idx += 1
-        self.current_tab_idx %= 3
-        self.tabWidget.setCurrentIndex(self.current_tab_idx)
+    def set_task(self, task: Task):
+        self.task = task
+        self.final = None
+        self.file = task.solver
+        match self.file.suffix:
+            case '.cpp':
+                self.final, pp = cpp.preprocess(self.file)
+                pp = ''.join(pp)
+                self.ppTextEdit.setPlainText(pp)
+            case _:
+                with open(self.file.path, 'r') as s:
+                    self.final = s.readlines()
+            # self.removeMainButton.setEnabled(F)
+        self.main = File(f"Main{self.file.suffix}").create()
+        self.main.taskname = self.task.name
+        with open(self.main.path, 'w') as w:
+            w.writelines(self.final)
+        self.finalTextEdit.setPlainText(''.join(self.final))
+        assert os.path.exists(self.main.path)
 
     def switch_tab(self):
         self.current_tab_idx += 1
@@ -59,12 +61,7 @@ class CodeSubmitter(QDialog, Ui_CodeSubmitter):
         self.tabWidget.setCurrentIndex(self.current_tab_idx)
         
     def validate(self):
-        if not self.path.endswith('.cpp'):
-            return
-        _, tmpfn = tempfile.mkstemp(suffix='.cpp')
-        with open(tmpfn, 'w') as s:
-            s.write(self.finalTextEdit.toPlainText())
-        cmpl_cmd = File(tmpfn).compile_cmd
+        cmpl_cmd = self.main.compile_cmd
         p = Popen(cmpl_cmd.split(), stderr=PIPE, text=True)
         if p.wait():
             self.errTextEdit.setPlainText(p.stderr.read())
@@ -75,17 +72,16 @@ class CodeSubmitter(QDialog, Ui_CodeSubmitter):
             self.tabWidget.setCurrentIndex(0)
             self.errTextEdit.clear()
             self.label.setText("Compilation Ok")
-        os.remove(tmpfn)
 
     def copy(self):
-        clipboard.copy(self.finalTextEdit.toPlainText().replace('\t', ' ' * 4))
+        QGuiApplication.clipboard().setText(self.finalTextEdit.toPlainText().replace('\t', ' ' * 4))
         self.label.setText('Copied')
     
     def remove_main(self):
         txt = self.final
         lines = []
         MAIN = ''
-        match os.path.splitext(self.path)[1]:
+        match os.path.splitext(self.file.path)[1]:
             case '.cpp':
                 MAIN = r'\s*(int|void)\s+main\('
             case '.py':

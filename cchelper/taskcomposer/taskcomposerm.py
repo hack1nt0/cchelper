@@ -106,6 +106,7 @@ class TaskComposerM(QMainWindow, Ui_TaskComposerM):
         self.taskBrowser.rename_task_signal.connect(task_renamed)
 
         self.verdictBrowser.view_file_signal.connect(self.view_file)
+        self.verdictBrowser.add_test_signal.connect(self.testBrowser.add_test)
 
         ##### TASKS
         self.task: Task = None
@@ -238,7 +239,8 @@ class TaskComposerM(QMainWindow, Ui_TaskComposerM):
         global_stopflag.set()
 
     def submit_task(self):
-        d = CodeSubmitter(self.task.solver, self)
+        d = CodeSubmitter(self)
+        d.set_task(self.task)
         d.exec()
 
     def set_color(self, v: QPalette):

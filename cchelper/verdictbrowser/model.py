@@ -10,8 +10,6 @@ class VerdictModel(QAbstractTableModel):
         super().__init__(parent)
         self.dats: List[Verdict] = []
         self.cols: List[str] = [
-            "added_as_test",
-            "id",
             "status",
             "cmd",
             "input",
@@ -51,13 +49,12 @@ class VerdictModel(QAbstractTableModel):
         match role:
             case Qt.ItemDataRole.EditRole:
                 ret = raw
-            case Qt.ItemDataRole.DisplayRole:
+            case Qt.ItemDataRole.DisplayRole | Qt.ItemDataRole.ToolTipRole:
                 if isinstance(raw, File):
                     ret = raw.tail(self.tail_bytes)
-                elif col == "id":
-                    ret = f"{dat.id}/{dat.test_id}"
                 elif col == "status":
-                    ret = f"{dat.status_detail}\nCpu: {dat.cpu}MS\nMemory: {dat.mem}MB\nPipe: {bytes_str(dat.flow_bytes)}/{dat.progress}%"
+                    ret = f"{dat.status_detail}\nCpu: {dat.cpu}MS\nMemory: {dat.mem}MB\nPipe: {bytes_str(dat.flow_bytes)}/{dat.progress}%" \
+                        + f"\ntid/id: {dat.test_id}/{dat.id}"
                 else:
                     ret = raw
             # case Qt.ItemDataRole.DecorationRole:
@@ -69,16 +66,6 @@ class VerdictModel(QAbstractTableModel):
             #             painter.setPen(QColor(255, 0, 0, 128))
             #             painter.drawText(QRect(0, 0, iw, ih), dat.status.name)
             #             ret = QIcon(pixmap)
-            case Qt.ItemDataRole.ToolTipRole:
-                pass
-            case Qt.ItemDataRole.CheckStateRole:
-                match col:
-                    case "id":
-                        ret = (
-                            Qt.CheckState.Checked
-                            if dat.added_as_test
-                            else Qt.CheckState.Unchecked
-                        )
             case Qt.ItemDataRole.ForegroundRole:
                 if col == "status":
                     ret = VerdictModel.COLORS[VS.kind(dat.status)]
@@ -135,3 +122,6 @@ class VerdictModel(QAbstractTableModel):
                                     map(lambda s: s.capitalize(), col.split("_"))
                                 )
         return ret
+
+    def row(self) -> Test | None:
+        return self.dats[self.offset] if len(self.dats) else None

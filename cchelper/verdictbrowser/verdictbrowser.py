@@ -6,7 +6,7 @@ from cchelper.chartviewer import ChartViewerD
 
 
 class VerdictBrowser(QWidget, Ui_VerdictBrowser):
-    add_test_signal: Signal = Signal()
+    add_test_signal: Signal = Signal(Test)
     view_file_signal: Signal = Signal(File)
     view_graph_signal: Signal = Signal(File)
 
@@ -117,7 +117,6 @@ class VerdictBrowser(QWidget, Ui_VerdictBrowser):
             case "Run":
                 if not self.task.interactive:
                     cols = {
-                        "id",
                         "status",
                         "input",
                         "actual",
@@ -126,7 +125,6 @@ class VerdictBrowser(QWidget, Ui_VerdictBrowser):
                     }
                 else:
                     cols = {
-                        "id",
                         "status",
                         "stderr",
                         "input",
@@ -184,47 +182,45 @@ class VerdictBrowser(QWidget, Ui_VerdictBrowser):
         self.model.refresh()
 
     def add_as_test(self):
-        if self.model.rowCount() == 0:
+        verdict = self.model.row()
+        if verdict is None:
             return
-        verdict = self.model.dats[self.model.offset]
+        if verdict.added_as_test:
+            logger.info(f"Already added.")
+            return
         if verdict.test_id is None:
             logger.info(f"Failed to add verdict #{verdict.id} as test: compilation.")
             return
         if VS.kind(verdict.status) == 3:
             logger.info(f"Failed to add verdict #{verdict.id} as test: unfinished.")
             return
-        test_id = None
-        for test in self.task.tests:
-            if test.input_type == IT.MANUAL and test.input == verdict.input:
-                test_id = test.id
-                break
-        if test_id is None:
-            test_id = len(self.task.tests)
-            test = Test(
-                id=test_id,
-                status=verdict.status,
-                checked=T,
-                input_type=IT.MANUAL,
-                answer_type=self.task.tests[verdict.test_id].answer_type,
-                input=File(self.task.test_dir(test_id, "input.txt")),
-                answer=File(self.task.test_dir(test_id, "answer.txt")),
-            )
-            with (
-                open(verdict.input.path, "r") as r,
-                open(test.input.path, "w") as w,
-            ):
-                # w.write(r.read())  # TODO
-                for line in r:
-                    w.write(line)
-            with (
-                open(verdict.answer.path, "r") as r,
-                open(test.answer.path, "w") as w,
-            ):
-                for line in r:
-                    w.write(line)
-            self.task.tests.append(test)
-        verdict.added_as_test = T
-        logger.info(f"Successfully added verdict #{verdict.id} as test #{test_id}.")
+        test = self.task.tests[verdict.test_id]
+        new: Test = None
+        match (test.input_type, test.answer_type, self.task.interactive):
+            case (IT.GENERATOR, AT.JURGER, F) | (IT.GENERATOR, AT.MANUAL, F) | (IT.MANUAL, AT.JURGER, F):
+                new = Test(
+                    status=verdict.status,
+                    input_type=IT.MANUAL,
+                    answer_type=AT.MANUAL,
+                    input=verdict.input,
+                    answer=verdict.answer,
+                )
+            case (IT.GENERATOR, AT.JURGER, T) | (IT.MANUAL, AT.JURGER, T):
+                new = Test(
+                    status=verdict.status,
+                    input_type=IT.MANUAL,
+                    answer_type=AT.JURGER,
+                    input=verdict.input,
+                    answer=test.answer,
+                )
+        if new is not None:
+            new = self.task.new_test(new)
+            self.add_test_signal.emit(new)
+            verdict.added_as_test = True
+            logger.info(f"Successfully added verdict #{verdict.id} as test #{new.id}.")
+        else:
+            verdict.added_as_test = True
+            logger.info(f"Already added.")
 
     def extract_gvdots(self):
         self.view_graph_signal.emit(self.view.currentIndex().data(role=Qt.ItemDataRole.EditRole))

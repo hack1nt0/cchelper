@@ -55,15 +55,10 @@ class TestBrowser(QWidget, Ui_TestBrowser):
         self.model.set_dats(task.tests)
 
     def new_tst(self):
-        tid = len(self.task.tests)
-        test = Test(
-            id=tid,
-            status=VS.QUE,
-            input_type=IT.MANUAL,
-            input=File(self.task.test_dir(tid, "Input.txt")).create(),
-            answer_type=AT.MANUAL,
-            answer=File(self.task.test_dir(tid, "Answer.txt")).create(),
-        )
+        test = self.task.new_test()
+        self.add_test(test)
+
+    def add_test(self, test: Test):
         self.model.add_dat(test)
         self.view.setFocus()
 

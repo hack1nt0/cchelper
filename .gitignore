@@ -1,6 +1,7 @@
 .DS_Store
 *~
 cchelper/terminal/xtermjs/
+data/db/config.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

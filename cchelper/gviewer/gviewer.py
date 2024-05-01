@@ -193,19 +193,21 @@ class GViewer(QDialog, Ui_GWidget):
 	edge [color=white];
 """
 
-        self.source = File(paths.graph("1.dot")).create()
-        if not os.path.exists(self.source.path):
-            with open(self.source.path, 'w') as w:
-                w.write("digraph {}")
-        self.refresh()
-
     @property
     def L(self):
         return [
             action.text() for action in self.l_menu.actions() if action.isChecked()
         ][0]
+    
+    @property
+    def source(self) -> File:
+        ret = File(f"{self.spinBox.value()}.dot")
+        if not os.path.exists(ret.path):
+            with open(ret.path, 'w') as w:
+                w.write(f"digraph {{{self.DEFAULT_COLOR}}}")
+        return ret
 
-    def set_file(self, source: str):
+    def set_file(self, source: str | File):
         self.show()  # TODO
         self.source = source if isinstance(source, File) else File(source)
         dots = []
@@ -227,15 +229,8 @@ class GViewer(QDialog, Ui_GWidget):
                             buf.clear()
         if dots:
             for idx, dot in enumerate(dots, start=1):
-                with open(
-                    os.path.join(os.path.dirname(self.source.path), f"{idx}.dot"), "w"
-                ) as w:
+                with open(f"{idx}.dot", "w") as w:
                     w.write(dot)
-        else:
-            with open(
-                os.path.join(os.path.dirname(self.source.path), f"1.dot"), "w"
-            ) as w:
-                w.write(f"digraph {{{self.DEFAULT_COLOR}}}")
         self.spinBox.blockSignals(T)
         ptot = max(1, len(dots))
         self.spinBox.setRange(1, ptot)
@@ -245,22 +240,14 @@ class GViewer(QDialog, Ui_GWidget):
         self.refresh()
 
     def refresh(self):
-        dot_path = conf.graphviz
-        if not dot_path:
-            logger.error("Dot not in PATH")
-            return
-        self.source = File(
-            os.path.join(
-                os.path.dirname(self.source.path), f"{self.spinBox.value()}.dot"
-            )
-        )
         target = os.path.splitext(self.source.path)[0] + ".json"
         try:
             # gv.render(
             #     engine=self.L, filepath=self.source, format="json", outfile=target
             # )
+            cmd = f"docker exec dev dot -Tjson -K{self.L} -o {target} {self.source.path}",
             subprocess.run(
-                f"{dot_path} -Tjson -K{self.L} -o {target} {self.source.path}",
+                cmd,
                 shell=T,
                 stderr=PIPE,
                 check=T,
@@ -271,6 +258,7 @@ class GViewer(QDialog, Ui_GWidget):
             return
 
         # self.gitems.clear()
+        target = os.path.join(conf.project_dir, target)
         with open(target) as r:
             dat = json.load(r)
         try:
@@ -280,17 +268,17 @@ class GViewer(QDialog, Ui_GWidget):
             logger.exception(e)
 
         target = os.path.splitext(self.source.path)[0] + ".svg"
+        cmd = f"docker exec dev dot -Tsvg -K{self.L} -o {target} {self.source.path}",
         subprocess.run(
-            f"{dot_path} -Tsvg -K{self.L} -o {target} {self.source.path}",
+            cmd,
             shell=T,
             stderr=PIPE,
             check=T,
         )
-        # gv.render(engine=self.L, filepath=self.source, format="svg", outfile=target)
+        target = os.path.join(conf.project_dir, target)
         self.svg_item = QGraphicsSvgItem(target)
 
         self.view.setItem(self.svg_item)
-        # self.view.setSceneRect(*map(float, dat["bb"].split(",")))
         self.view.setSceneRect(self.svg_item.boundingRect())
 
         self.label.setText(f"{self.nodes}/{self.edges}")
@@ -352,6 +340,7 @@ class GViewer(QDialog, Ui_GWidget):
         )
         image.save(self.png_fn)
         logger.info(f"Saved as {self.png_fn}")
+
 
     def edit_dot(self):
         d = CodeEditorD(self)

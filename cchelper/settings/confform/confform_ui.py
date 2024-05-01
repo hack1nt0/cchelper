@@ -24,7 +24,7 @@ class Ui_ConfForm(object):
     def setupUi(self, ConfForm):
         if not ConfForm.objectName():
             ConfForm.setObjectName(u"ConfForm")
-        ConfForm.resize(441, 434)
+        ConfForm.resize(435, 372)
         ConfForm.setWindowTitle(u"Settings")
         self.verticalLayout = QVBoxLayout(ConfForm)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -67,43 +67,13 @@ class Ui_ConfForm(object):
 
         self.horizontalLayout_5.addWidget(self.SLineEdit)
 
-        self.label_3 = QLabel(ConfForm)
-        self.label_3.setObjectName(u"label_3")
-
-        self.horizontalLayout_5.addWidget(self.label_3)
-
-        self.GLineEdit = QLineEdit(ConfForm)
-        self.GLineEdit.setObjectName(u"GLineEdit")
-
-        self.horizontalLayout_5.addWidget(self.GLineEdit)
-
-        self.label_2 = QLabel(ConfForm)
-        self.label_2.setObjectName(u"label_2")
-
-        self.horizontalLayout_5.addWidget(self.label_2)
-
-        self.JLineEdit = QLineEdit(ConfForm)
-        self.JLineEdit.setObjectName(u"JLineEdit")
-
-        self.horizontalLayout_5.addWidget(self.JLineEdit)
-
 
         self.formLayout_2.setLayout(1, QFormLayout.FieldRole, self.horizontalLayout_5)
-
-        self.editorLabel = QLabel(ConfForm)
-        self.editorLabel.setObjectName(u"editorLabel")
-
-        self.formLayout_2.setWidget(2, QFormLayout.LabelRole, self.editorLabel)
-
-        self.editorEdit = QLineEdit(ConfForm)
-        self.editorEdit.setObjectName(u"editorEdit")
-
-        self.formLayout_2.setWidget(2, QFormLayout.FieldRole, self.editorEdit)
 
         self.maxBitsLabel = QLabel(ConfForm)
         self.maxBitsLabel.setObjectName(u"maxBitsLabel")
 
-        self.formLayout_2.setWidget(3, QFormLayout.LabelRole, self.maxBitsLabel)
+        self.formLayout_2.setWidget(2, QFormLayout.LabelRole, self.maxBitsLabel)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -125,12 +95,12 @@ class Ui_ConfForm(object):
         self.horizontalLayout.addWidget(self.rowsPerPageSpinBox)
 
 
-        self.formLayout_2.setLayout(3, QFormLayout.FieldRole, self.horizontalLayout)
+        self.formLayout_2.setLayout(2, QFormLayout.FieldRole, self.horizontalLayout)
 
         self.initialRowsLabel = QLabel(ConfForm)
         self.initialRowsLabel.setObjectName(u"initialRowsLabel")
 
-        self.formLayout_2.setWidget(4, QFormLayout.LabelRole, self.initialRowsLabel)
+        self.formLayout_2.setWidget(3, QFormLayout.LabelRole, self.initialRowsLabel)
 
         self.bytesPerPageSpinBox = QSpinBox(ConfForm)
         self.bytesPerPageSpinBox.setObjectName(u"bytesPerPageSpinBox")
@@ -139,12 +109,12 @@ class Ui_ConfForm(object):
         self.bytesPerPageSpinBox.setMaximum(100001)
         self.bytesPerPageSpinBox.setValue(10000)
 
-        self.formLayout_2.setWidget(4, QFormLayout.FieldRole, self.bytesPerPageSpinBox)
+        self.formLayout_2.setWidget(3, QFormLayout.FieldRole, self.bytesPerPageSpinBox)
 
         self.pipeLabel = QLabel(ConfForm)
         self.pipeLabel.setObjectName(u"pipeLabel")
 
-        self.formLayout_2.setWidget(5, QFormLayout.LabelRole, self.pipeLabel)
+        self.formLayout_2.setWidget(4, QFormLayout.LabelRole, self.pipeLabel)
 
         self.bytesPerReadSpinBox = QSpinBox(ConfForm)
         self.bytesPerReadSpinBox.setObjectName(u"bytesPerReadSpinBox")
@@ -152,12 +122,12 @@ class Ui_ConfForm(object):
         self.bytesPerReadSpinBox.setMinimum(1)
         self.bytesPerReadSpinBox.setMaximum(1000001)
 
-        self.formLayout_2.setWidget(5, QFormLayout.FieldRole, self.bytesPerReadSpinBox)
+        self.formLayout_2.setWidget(4, QFormLayout.FieldRole, self.bytesPerReadSpinBox)
 
         self.buildOptsLabel = QLabel(ConfForm)
         self.buildOptsLabel.setObjectName(u"buildOptsLabel")
 
-        self.formLayout_2.setWidget(6, QFormLayout.LabelRole, self.buildOptsLabel)
+        self.formLayout_2.setWidget(5, QFormLayout.LabelRole, self.buildOptsLabel)
 
         self.buildModeGroupBox = QGroupBox(ConfForm)
         self.buildModeGroupBox.setObjectName(u"buildModeGroupBox")
@@ -180,22 +150,22 @@ class Ui_ConfForm(object):
         self.horizontalLayout_4.addWidget(self.buildReleaseRadioButton)
 
 
-        self.formLayout_2.setWidget(6, QFormLayout.FieldRole, self.buildModeGroupBox)
+        self.formLayout_2.setWidget(5, QFormLayout.FieldRole, self.buildModeGroupBox)
 
         self.buildAsNeedCheckBox = QCheckBox(ConfForm)
         self.buildAsNeedCheckBox.setObjectName(u"buildAsNeedCheckBox")
 
-        self.formLayout_2.setWidget(7, QFormLayout.FieldRole, self.buildAsNeedCheckBox)
+        self.formLayout_2.setWidget(6, QFormLayout.FieldRole, self.buildAsNeedCheckBox)
 
         self.runinshellCheckBox = QCheckBox(ConfForm)
         self.runinshellCheckBox.setObjectName(u"runinshellCheckBox")
 
-        self.formLayout_2.setWidget(8, QFormLayout.FieldRole, self.runinshellCheckBox)
+        self.formLayout_2.setWidget(7, QFormLayout.FieldRole, self.runinshellCheckBox)
 
         self.dumpWarmUpLabel = QLabel(ConfForm)
         self.dumpWarmUpLabel.setObjectName(u"dumpWarmUpLabel")
 
-        self.formLayout_2.setWidget(9, QFormLayout.LabelRole, self.dumpWarmUpLabel)
+        self.formLayout_2.setWidget(8, QFormLayout.LabelRole, self.dumpWarmUpLabel)
 
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
@@ -214,12 +184,12 @@ class Ui_ConfForm(object):
         self.horizontalLayout_2.addWidget(self.exeWarmSpinBox)
 
 
-        self.formLayout_2.setLayout(9, QFormLayout.FieldRole, self.horizontalLayout_2)
+        self.formLayout_2.setLayout(8, QFormLayout.FieldRole, self.horizontalLayout_2)
 
         self.parallelLabel = QLabel(ConfForm)
         self.parallelLabel.setObjectName(u"parallelLabel")
 
-        self.formLayout_2.setWidget(10, QFormLayout.LabelRole, self.parallelLabel)
+        self.formLayout_2.setWidget(9, QFormLayout.LabelRole, self.parallelLabel)
 
         self.horizontalLayout_6 = QHBoxLayout()
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
@@ -240,12 +210,12 @@ class Ui_ConfForm(object):
         self.horizontalLayout_6.addWidget(self.refreshRateSpinBox)
 
 
-        self.formLayout_2.setLayout(10, QFormLayout.FieldRole, self.horizontalLayout_6)
+        self.formLayout_2.setLayout(9, QFormLayout.FieldRole, self.horizontalLayout_6)
 
         self.fontLabel = QLabel(ConfForm)
         self.fontLabel.setObjectName(u"fontLabel")
 
-        self.formLayout_2.setWidget(11, QFormLayout.LabelRole, self.fontLabel)
+        self.formLayout_2.setWidget(10, QFormLayout.LabelRole, self.fontLabel)
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setSpacing(0)
@@ -261,17 +231,7 @@ class Ui_ConfForm(object):
         self.horizontalLayout_3.addWidget(self.fontButton)
 
 
-        self.formLayout_2.setLayout(11, QFormLayout.FieldRole, self.horizontalLayout_3)
-
-        self.graphvizLabel = QLabel(ConfForm)
-        self.graphvizLabel.setObjectName(u"graphvizLabel")
-
-        self.formLayout_2.setWidget(12, QFormLayout.LabelRole, self.graphvizLabel)
-
-        self.graphvizLineEdit = QLineEdit(ConfForm)
-        self.graphvizLineEdit.setObjectName(u"graphvizLineEdit")
-
-        self.formLayout_2.setWidget(12, QFormLayout.FieldRole, self.graphvizLineEdit)
+        self.formLayout_2.setLayout(10, QFormLayout.FieldRole, self.horizontalLayout_3)
 
 
         self.verticalLayout.addLayout(self.formLayout_2)
@@ -287,13 +247,6 @@ class Ui_ConfForm(object):
         self.openButton.setText(QCoreApplication.translate("ConfForm", u"...", None))
         self.defaultFileNameLabel.setText(QCoreApplication.translate("ConfForm", u"Default Files:", None))
         self.SLineEdit.setText(QCoreApplication.translate("ConfForm", u"Solver.cpp", None))
-        self.label_3.setText(QCoreApplication.translate("ConfForm", u" + ", None))
-        self.GLineEdit.setText(QCoreApplication.translate("ConfForm", u"Generator.py", None))
-        self.GLineEdit.setPlaceholderText(QCoreApplication.translate("ConfForm", u"Generator", None))
-        self.label_2.setText(QCoreApplication.translate("ConfForm", u" + ", None))
-        self.JLineEdit.setText(QCoreApplication.translate("ConfForm", u"Jurger.cpp", None))
-        self.JLineEdit.setPlaceholderText(QCoreApplication.translate("ConfForm", u"Jurger", None))
-        self.editorLabel.setText(QCoreApplication.translate("ConfForm", u"Ext. Editor:", None))
         self.maxBitsLabel.setText(QCoreApplication.translate("ConfForm", u"Table:", None))
         self.bytesPerCellSpinBox.setSuffix(QCoreApplication.translate("ConfForm", u" bytes/cell", None))
         self.initialRowsLabel.setText(QCoreApplication.translate("ConfForm", u"File Viewer:", None))
@@ -307,7 +260,6 @@ class Ui_ConfForm(object):
         self.parallelLabel.setText(QCoreApplication.translate("ConfForm", u"Parallels:", None))
         self.fontLabel.setText(QCoreApplication.translate("ConfForm", u"Font:", None))
         self.fontButton.setText(QCoreApplication.translate("ConfForm", u"...", None))
-        self.graphvizLabel.setText(QCoreApplication.translate("ConfForm", u"Graphviz:", None))
         pass
     # retranslateUi
 

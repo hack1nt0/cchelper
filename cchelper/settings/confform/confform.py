@@ -18,9 +18,6 @@ class ConfForm(QWidget, Ui_ConfForm):
         self.mapper.setItemDelegate(self.deleg)
         self.mapper.addMapping(self.projectEdit, self.model.cols.index("project_dir"))
         self.mapper.addMapping(self.SLineEdit, self.model.cols.index("solver"))
-        self.mapper.addMapping(self.GLineEdit, self.model.cols.index("generator"))
-        self.mapper.addMapping(self.JLineEdit, self.model.cols.index("jurger"))
-        self.mapper.addMapping(self.editorEdit, self.model.cols.index("editor"))
         self.mapper.addMapping(
             self.bytesPerCellSpinBox, self.model.cols.index("bytes_per_cell")
         )
@@ -58,7 +55,6 @@ class ConfForm(QWidget, Ui_ConfForm):
         self.mapper.addMapping(self.fontLineEdit, self.model.cols.index("font"))
         self.fontLineEdit.setReadOnly(T)
         self.fontButton.clicked.connect(self.pick_font)
-        self.mapper.addMapping(self.graphvizLineEdit, self.model.cols.index("graphviz"))
         self.mapper.toFirst()
 
         # self.buttonBox.button(QDialogButtonBox.StandardButton.Reset).clicked.connect(self.mapper.revert)

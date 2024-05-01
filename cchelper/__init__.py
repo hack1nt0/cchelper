@@ -74,7 +74,7 @@ def bytes_str(bs: int) -> str:
 
 import logging
 from .logger import logger
-from .db import db
+# from .db import db
 from .entity import *
 import cchelper.paths as paths
 from .windows import *
