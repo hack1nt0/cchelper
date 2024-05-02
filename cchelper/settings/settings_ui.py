@@ -63,7 +63,7 @@ class Ui_Settings(object):
     # setupUi
 
     def retranslateUi(self, Settings):
-        Settings.setWindowTitle(QCoreApplication.translate("Settings", u"Dialog", None))
+        Settings.setWindowTitle(QCoreApplication.translate("Settings", u"Settings", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.confform), QCoreApplication.translate("Settings", u"General", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.langbrowser), QCoreApplication.translate("Settings", u"Languages", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tagbrowser), QCoreApplication.translate("Settings", u"Tags", None))

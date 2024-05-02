@@ -16,7 +16,7 @@ class TextEditor(QWidget, Ui_TextEditor):
         self.saveButton.setShortcut("Ctrl+S")
         self.saveButton.clicked.connect(self.save)
 
-        font = QFont(*conf.font)
+        font = conf.font
         self.textEdit.setFont(font)
         self.textEdit.setTabStopDistance(QFontMetricsF(font).horizontalAdvance(" " * 4))
         # self.label.setStyleSheet("background-color : blue; color : white;")

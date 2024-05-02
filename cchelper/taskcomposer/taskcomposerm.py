@@ -51,10 +51,15 @@ class TaskComposerM(QMainWindow, Ui_TaskComposerM):
         self.helpButton.setIcon(QIcon(paths.img("question.png")))
 
         ### SETTING
+        self.settingD = Settings(self)
+        self.settingD.font_changed_signal.connect(self.font_changed)
+        self.settingD.project_changed_signal.connect(self.project_changed)
+        self.settingD.hide()
         self.settingButton.setToolTip("Settings/Tools (Ctrl+,)")
         self.settingButton.setShortcut("Ctrl+,")
         self.settingButton.setIcon(QIcon(paths.img("setting.png")))
-        self.settingButton.clicked.connect(lambda: Settings(self).exec())
+        self.settingButton.clicked.connect(self.settingD.exec)
+
         self.helpButton.clicked.connect(
             lambda: QDesktopServices.openUrl(
                 "https://time-oviraptor-66c.notion.site/cchelper-a8b256d6d2534c609f04d15a7f8e95f0"
@@ -71,10 +76,9 @@ class TaskComposerM(QMainWindow, Ui_TaskComposerM):
                 self.helpButton.setEnabled(T)
                 self.settingButton.setEnabled(T)
                 self.taskBrowser.setEnabled(T)
-                self.terminal.new_shell('/code')
-                os.chdir(conf.project_dir)
                 if self.task is not None:
                     self.task.save()
+                    self.task.remove_symlinks()
                 self.solveButton.setStyleSheet('')
             else:
                 if self.task is None or self.task.name != task.name:
@@ -85,8 +89,7 @@ class TaskComposerM(QMainWindow, Ui_TaskComposerM):
                         w.setEnabled(T)
                     self.testBrowser.set_task(task)
                     self.verdictBrowser.set_task(task)
-                    self.terminal.new_shell(f"/code/tasks/{task.name}")
-                    os.chdir(task.dir())
+                    task.create_symlinks()
                 match task.status:
                     case TS.SOLVED:
                         self.solveButton.setStyleSheet('background-color: green')
@@ -150,7 +153,24 @@ class TaskComposerM(QMainWindow, Ui_TaskComposerM):
         ### Terminal
         windows["terminal"] = self.terminal
 
-        solve_task(None)
+    def chdir(self):
+        wd = conf.working_dir()
+        os.makedirs(wd, exist_ok=T)
+
+    def precheck(self):
+        if not conf.project_dir or not conf.font:
+            self.settingD.exec()
+        self.taskBrowser.find_task()
+        self.chdir()
+        self.terminal.set_pty()
+
+    def project_changed(self):
+        self.taskBrowser.find_task()
+        self.chdir()
+        self.terminal.set_pty()
+
+    def font_changed(self):
+        self.terminal.set_font()
 
     def set_model(self, model, idx):
         self.model = model

@@ -1,97 +1,154 @@
-from cchelper.terminal.qterminal.mux import mux
 import pyte
 import paramiko
 import threading
 import time
 import uuid
 import traceback
+import sys
+import subprocess, os
+from cchelper import *
+import typing
+
+_WIN = sys.platform == "win32"
+if _WIN:
+    import winpty
+else:
+    import pty, tty
+    import termios
+    import struct
+    import fcntl
+
+DEFAULT_ROWS, DEFAULT_COLS = 100, 80
 
 
-class BaseBackend(object):
-
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-        self.screen = pyte.HistoryScreen(width, height, ratio=0.3)
+class BasePty(object):
+    def __init__(self):
+        self.screen = pyte.HistoryScreen(DEFAULT_COLS, DEFAULT_ROWS, ratio=0.3)
         self.stream = pyte.ByteStream(self.screen)
-        self.id = str(uuid.uuid4())
+        self.cursorX = 0
+        self.cursorY = 0
 
-    def write_to_screen(self, data):
-        try:
-            self.stream.feed(data)
-        except Exception as e:
-            traceback.print_exc()
-            
+    @property
+    def rows(self) -> int:
+        return self.screen.lines
 
-    def read(self):
-        pass
-
-    def resize(self, width, height):
-        self.width = width
-        self.height = height
-        self.screen.resize(columns=width, lines=height)
+    @property
+    def cols(self) -> int:
+        return self.screen.columns
 
     def connect(self):
         pass
 
-    def get_read_wait(self):
+    def write_to_screen(self, dat: bytes):
+        try:
+            self.stream.feed(dat)
+        except:  # TODO vim
+            pass
+
+    def write(self, dat: bytes):
         pass
 
-    def cursor(self):
+    def read(self) -> bytes:
+        pass
+
+    def resize(self, rows: int, cols: int):
+        self.screen.resize(columns=cols, lines=rows)
+
+    @property
+    def dirtyRows(self):
+        return self.screen.dirty
+    
+    def clearDirty(self):
+        self.screen.dirty.clear()
+    
+    def row(self, idx: int):
+        line = self.screen.buffer[idx]
+        for col in range(self.cols):
+            yield line[col]
+    
+    @property
+    def cursor(self) -> pyte.screens.Cursor:
         return self.screen.cursor
 
-    def close(self):
-        pass
 
-
-class PtyBackend(BaseBackend):
-    pass
-
-
-class SSHBackend(BaseBackend):
-
-    def __init__(self, width, height, ip, username=None, password=None):
-        super(SSHBackend, self).__init__(width, height)
-        self.ip = ip
-        self.username = username
-        self.password = password
-        self.thread = threading.Thread(target=self.connect)
-        self.ssh_client = None
-        self.channel = None
-        self.thread.start()
+class LocalPty(BasePty):
 
     def connect(self):
+        if _WIN:
+            pass
+        else:
+            self.masterfd, self.slavefd = pty.openpty()
+            sh = 'wsl' if _WIN else os.environ.get("SHELL", "sh")
+            self.process = subprocess.Popen(
+                sh,
+                shell=True,
+                stdin=self.slavefd,
+                stdout=self.slavefd,
+                stderr=self.slavefd,
+                close_fds=F,
+            )
+
+        self.screen.reset()
+
+    def write(self, dat: bytes):
+        while len(dat):
+            nb = os.write(self.masterfd, dat)
+            dat = dat[nb:]
+
+    def read(self) -> bytes:
+        return os.read(self.masterfd, 1024)
+
+    def resize(self, rows: int, cols: int):
+        if _WIN:
+            pass
+        else:
+            winsize = struct.pack("HHHH", rows, cols, 0, 0)
+            fcntl.ioctl(self.masterfd, termios.TIOCSWINSZ, winsize)
+            #TODO not apply to running process
+            pass
+        return super().resize(rows, cols)
+
+    def close(self):
+        os.close(self.masterfd)
+        os.close(self.slavefd)
+        self.process.terminate()
+
+
+class SshPty(BasePty):
+
+    def connect(self, ip: str, port: int, username, password):
         self.ssh_client = paramiko.SSHClient()
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.ssh_client.connect(self.ip, username=self.username, password=self.password)
-        self.channel = self.ssh_client.get_transport().open_session()
-        self.channel.get_pty(width=self.width, height=self.height)
-        self.channel.invoke_shell()
+        self.ssh_client.connect(ip, port=port, username=username, password=password)
+        self.channel = self.ssh_client.invoke_shell(
+            term="xterm",
+        )
 
         timeout = 60
         while not self.channel.recv_ready() and timeout > 0:
-            time.sleep(1)
-            timeout -= 1
+            time.sleep(0.1)
+            timeout -= 0.1
+        assert self.channel.recv_ready()
+        self.channel.set_combine_stderr(T)
+        self.channel.settimeout(None)
+        self.screen.reset()
 
-        self.channel.resize_pty(width=self.width, height=self.height)
+    def write(self, dat: bytes):
+        while len(dat):
+            send = self.channel.send(dat)
+            if send == 0 and len(dat):
+                logger.error(f"Pty closed before write: {dat.decode(errors='replace')}")
+                return
+            dat = dat[send:]
 
-        mux.add_backend(self)
-
-    def get_read_wait(self):
-        return self.channel
-
-    def write(self, data):
-        self.channel.send(data)
-
-    def read(self):
-        output = self.channel.recv(1024)
-        self.write_to_screen(output)
-
-    def resize(self, width, height):
-        super(SSHBackend, self).resize(width, height)
-        if self.channel:
-            self.channel.resize_pty(width=width, height=height)
+    def read(self) -> bytes:
+        return self.channel.recv(1024)
+    
+    def resize(self, rows: int, cols: int):
+        if not (rows == self.rows and cols == self.cols):
+            self.channel.resize_pty(width=cols, height=rows)
+            super().resize(rows, cols)
 
     def close(self):
+        self.channel.close()
         self.ssh_client.close()
-        mux.remove_and_close(self)

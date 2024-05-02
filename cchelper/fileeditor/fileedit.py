@@ -14,7 +14,7 @@ class FileEdit(QPlainTextEdit):
 
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
-        font = QFont(*conf.font)
+        font = conf.font
         self.setFont(font)
         self.setTabStopDistance(QFontMetricsF(font).horizontalAdvance(" " * 4))
         self._mode = None

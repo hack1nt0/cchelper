@@ -10,7 +10,7 @@ class LangForm(QDialog, Ui_LangForm):
         super().__init__(parent)
         self.setupUi(self)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        font = QFont(*conf.font)
+        font = conf.font
         self.templateTextEdit.setFont(font)
         self.templateTextEdit.setTabStopDistance(QFontMetricsF(font).horizontalAdvance(' ' * 4))
 

@@ -17,11 +17,11 @@ import glob
 class TaskCondition:
     url: str = None
     name: str = None
-    tags: int = None
+    tags: int = 0
     solver: re.Pattern = None
     ctimeL: int = None
     ctimeR: int = None
-    status: TS = None
+    status: TS = TS.UNSOLVED
 
 
 class TaskBrowser(QWidget, Ui_TaskBrowser):
@@ -82,8 +82,6 @@ class TaskBrowser(QWidget, Ui_TaskBrowser):
         self.findButton.setShortcut("Ctrl+F")
 
         self.condition = TaskCondition()
-        self.condition.solved = 2
-        self.condition.tags = 0
         self.load_killed = threading.Event()
         self.found_task_signal.connect(self.add_task_from_loader)
 
@@ -213,84 +211,88 @@ class TaskBrowser(QWidget, Ui_TaskBrowser):
             self.spinBox.setSuffix(f" tasks")
             self.model.dats.clear()
             self.model.modelReset.emit()
-            self.solve_task_signal.emit(self.task)
+            self.solve_task_signal.emit(None)
             self.spinBox.blockSignals(F)
             global_threadpool.submit(self.load_tasks)
 
     def load_tasks(self) -> None:
-        condition = self.condition
+        try:
+            condition = self.condition
 
-        def meet_req(task: Task) -> bool:
-            ret = T
-            if condition.ctimeL and condition.ctimeR:
-                ret &= condition.ctimeL <= task.ctime <= condition.ctimeR
-            ret &= (condition.tags & task.tags) == condition.tags
-            if condition.status:
-                ret &= condition.status == task.status
-            if condition.url:
-                ret &= condition.url in task.url.lower()
-            if condition.name:
-                ret &= condition.name in task.name.lower()
-            if condition.solver:
-                ret &= condition.solver in open(task.solver.path).read().lower()
-            return ret
+            def meet_req(task: Task) -> bool:
+                ret = T
+                if condition.ctimeL and condition.ctimeR:
+                    ret &= condition.ctimeL <= task.ctime <= condition.ctimeR
+                ret &= (condition.tags & task.tags) == condition.tags
+                if condition.status:
+                    ret &= condition.status == task.status
+                if condition.url:
+                    ret &= condition.url in task.url.lower()
+                if condition.name:
+                    ret &= condition.name in task.name.lower()
+                if condition.solver:
+                    ret &= condition.solver in open(task.solver.path).read().lower()
+                return ret
 
-        def relative(x: str, task: Task):
-            if x.startswith('/Users/dy/cc'):
-                x = os.path.relpath(x, os.path.join('/Users/dy/cc', task.name))
-            return x
+            def relative(x: str, task: Task):
+                # if x.startswith('/Users/dy/cc'):
+                #     x = os.path.relpath(x, os.path.join('/Users/dy/cc', task.name))
+                return x
 
-        solver_pattern = re.compile("^(sol|solver|solution|[a-z])$")
-        for root, dns, fns in os.walk(conf.tasks_dir()):
-            if self.load_killed.is_set():
-                break
-            if os.path.split(root)[-1] == "dist":
-                continue
-            root_istask = F
-            if "meta.pickle" in fns:
-                with open(os.path.join(root, "meta.pickle"), "rb") as r:
-                    task: Task = pickle.load(r)
-                    task.name = os.path.relpath(root, conf.tasks_dir())
-                    for test in task.tests:
-                        match test.input_type:
-                            case IT.MANUAL:
-                                test.input = File(relative(test.input.path, task))
-                            case IT.GENERATOR:
-                                test.input = File(
-                                    relative(
-                                        glob.glob(task.dir("F", "Generator.*"))[0], task
-                                    )
-                                )
-                        match test.answer_type:
-                            case AT.MANUAL:
-                                test.answer = File(relative(test.answer.path, task))
-                            case AT.JURGER:
-                                test.answer = File(
-                                    relative(
-                                        glob.glob(task.dir("F", "Jurger.*"))[0], task
-                                    )
-                                )
-                    task.solver = File(relative(task.solver.path, task))
-                    task.save()
-                    if meet_req(task):
-                        self.found_task_signal.emit(task)
-                root_istask = T
-            else:
-                for fn in fns:
-                    if self.load_killed.is_set():
-                        break
-                    prefix, suffix = map(lambda s: s.lower(), os.path.splitext(fn))
-                    if suffix and solver_pattern.match(prefix):
-                        task = Task()
+            solver_pattern = re.compile("^(sol|solver|solution|[a-z])$")
+            for root, dns, fns in os.walk(conf.tasks_dir()):
+                if self.load_killed.is_set():
+                    break
+                if os.path.split(root)[-1] == "dist":
+                    continue
+                root_istask = F
+                if "meta.pickle" in fns:
+                    with open(os.path.join(root, "meta.pickle"), "rb") as r:
+                        task: Task = pickle.load(r)
                         task.name = os.path.relpath(root, conf.tasks_dir())
-                        task.solver = File(fn)
+                        for test in task.tests:
+                            match test.input_type:
+                                case IT.MANUAL:
+                                    test.input = File(relative(test.input.path, task))
+                                case IT.GENERATOR:
+                                    test.input = File(
+                                        relative(
+                                            glob.glob(task.dir("F", "Generator.*"))[0], task
+                                        )
+                                    )
+                            match test.answer_type:
+                                case AT.MANUAL:
+                                    test.answer = File(relative(test.answer.path, task))
+                                case AT.JURGER:
+                                    test.answer = File(
+                                        relative(
+                                            glob.glob(task.dir("F", "Jurger.*"))[0], task
+                                        )
+                                    )
+                        task.solver = File(relative(task.solver.path, task))
+                        task.save()
                         if meet_req(task):
+                            logger.debug(task)
                             self.found_task_signal.emit(task)
-                        root_istask = T
-                        break
-            if root_istask:
-                dns.clear()
-        self.found_done_signal.emit()
+                    root_istask = T
+                else:
+                    for fn in fns:
+                        if self.load_killed.is_set():
+                            break
+                        prefix, suffix = map(lambda s: s.lower(), os.path.splitext(fn))
+                        if suffix and solver_pattern.match(prefix):
+                            task = Task()
+                            task.name = os.path.relpath(root, conf.tasks_dir())
+                            task.solver = File(fn)
+                            if meet_req(task):
+                                self.found_task_signal.emit(task)
+                            root_istask = T
+                            break
+                if root_istask:
+                    dns.clear()
+            self.found_done_signal.emit()
+        except Exception as e:
+            logger.exception(e)
 
     def add_task_from_loader(self, task: Task):
         self.model.dats.append(task)

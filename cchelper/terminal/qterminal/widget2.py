@@ -8,7 +8,7 @@ from PySide6.QtStateMachine import *
 
 import sys
 import traceback
-from cchelper.terminal.qterminal.backend import SSHBackend
+from cchelper.terminal.qterminal.backend import SshPty
 from datetime import datetime
 
 keymap = {
@@ -81,7 +81,7 @@ class QTerminalWidget(QWidget):
         self.default_brush = QBrush(self.colors['black'])
         self.default_pen = QPen(self.colors['white'])
 
-        self.backend = SSHBackend(self._columns, self._rows, host, user, password)
+        self.backend = SshPty(self._columns, self._rows, host, user, password)
         self.pixmap = QPixmap(self.width(), self.height())
 
         # scroll

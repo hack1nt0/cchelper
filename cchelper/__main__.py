@@ -1,6 +1,7 @@
 from PySide6.QtCore import QEvent, QObject
 from cchelper import *
 from cchelper.taskcomposer import TaskComposerM
+from cchelper.settings import Settings
 
 
 class App(QApplication):
@@ -27,10 +28,9 @@ if __name__ == "__main__":
         app.setStyleSheet(r.read())
 
     c = TaskComposerM()
-
     app.paletteChanged.connect(c.set_color)
-
     c.show()
+    c.precheck()
 
     # b.setting()
     # os.chdir(conf.project_dir) #TODO

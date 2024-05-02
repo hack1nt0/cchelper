@@ -46,7 +46,6 @@ from PySide6.QtSql import *
 from PySide6.QtCharts import *
 from PySide6.QtStateMachine import *
 
-
 WHITE = QColor(255, 255, 255)
 BLACK = QColor(0, 0, 0)
 BLUE = QColor(0, 0, 128)

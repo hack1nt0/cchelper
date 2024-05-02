@@ -622,7 +622,7 @@ class Task:
             )
     
     def create_symlinks(self):
-        os.makedirs(conf.working_dir('dist'), exist_ok=T)
+        os.makedirs(conf.working_dir(), exist_ok=T)
         for file in (self.solver, self.generator, self.jurger):
             source = file.path
             target = conf.working_dir(os.path.basename(file.path))

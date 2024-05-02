@@ -14,6 +14,7 @@ import itertools
 import math
 import io
 from concurrent.futures import ThreadPoolExecutor
+from PySide6.QtGui import QFont
 
 T, F = True, False
 import cchelper.paths as paths
@@ -61,7 +62,7 @@ class Configuration:
 
     def reset(self):  # restore to defaults
         self.dat = {
-            "project_dir": "/Users/dy/gits/cc",
+            "project_dir": None,
             "solver": "Solver.cpp",
             "parallel": 1,
             "refresh_rate": 10,
@@ -78,11 +79,7 @@ int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(&cout);
     int n; cin >> n;
-    for (int i = 0; i < n; ++i) {
-        int x, y;
-        cin >> x >> y;
-        cout << x + y << '\n';
-    }
+    for (int i = 0; i < n; ++i) solve(i);
     return 0;
 }
 """,
@@ -127,7 +124,7 @@ for _ in range(n):
             "log_level": "DEBUG",
             "exe_dump_delay": 1,
             "exe_warm_delay": 2,
-            "font": "JetBrains Mono,12",
+            "font": None,
         }
         self.save()
 
@@ -139,11 +136,14 @@ for _ in range(n):
     def project_dir(self) -> str:
         return self.dat["project_dir"]
 
+    def _project_dir(self, *args) -> str:
+        return os.path.join(self.project_dir, *map(str, args))
+
     def tasks_dir(self, *args) -> str:
-        return os.path.join(self.project_dir, "tasks", *map(str, args))
+        return self._project_dir("tasks", *args)
 
     def working_dir(self, *args) -> str:
-        return os.path.join(self.project_dir, "cchelper", *map(str, args))
+        return self._project_dir("current", *args)
 
     @property
     def solver(self) -> str:
@@ -238,9 +238,11 @@ for _ in range(n):
         return self.dat["exe_warm_delay"]
 
     @property
-    def font(self) -> Tuple[str, int]:
-        dat = self.dat["font"].split(",")
-        return (dat[0], int(dat[1]))
+    def font(self) -> QFont | None:
+        if self.dat['font']:
+            f, s = self.dat['font'].split(',')
+            return QFont(f, int(s))
+        return None
 
     @property
     def graphviz(self) -> str:
@@ -375,11 +377,15 @@ class File:
         # ret = f"docker exec dev bash compile{self.suffix}.sh /code/tasks/{self.taskname} {self.path} {self.executable} {1 if conf.build_debug else 0}"
         ret = None
         match self.suffix:
-            case ".cpp":
+            case '.cpp':
                 if conf.build_debug:
-                    ret = f"docker exec dev bash -c 'cd /code/tasks/{self.taskname}; c++ -I/code/include -std=c++17 -g -Wall -DDEBUG -fsanitize=address -fsanitize=undefined -o {self.executable} {self.path}'"
+                    ret = f"c++ -I/code/include -std=c++17 -g -Wall -DDEBUG -fsanitize=address -fsanitize=undefined -o {self.executable} {self.path}"
                 else:
-                    ret = f"docker exec dev bash -c 'cd /code/tasks/{self.taskname}; c++ -I/code/include -std=c++17 -O2 -o {self.executable} {self.path}'"
+                    ret = f"c++ -I/code/include -std=c++17 -O2 -o {self.executable} {self.path}"
+        if ret:
+            import sys
+            if sys.platform == 'win32':
+                ret = f"wsl {ret}"
         return ret
 
     @property
@@ -387,9 +393,13 @@ class File:
         ret = None
         match self.suffix:
             case ".cpp":
-                ret = f"docker exec -i dev bash -c 'cd /code/tasks/{self.taskname}; ./{self.executable}'"
+                ret = f"./{self.executable}"
             case ".py":
-                ret = f"docker exec -i dev bash -c 'cd /code/tasks/{self.taskname}; python3 {self.path}'"
+                ret = f"python3 {self.path}"
+        if ret:
+            import sys
+            if sys.platform == 'win32':
+                ret = f"wsl {ret}"
         return ret
 
     def format_cmd(self, cmd: str) -> str | List[str] | None:
@@ -401,6 +411,14 @@ class File:
     def executable(self) -> str:
         return self.prefix + ".exe"
 
+    @property
+    def executable_wsl(self) -> str:
+        return self.prefix + ".exe"
+
+    @property
+    def path_wsl(self) -> str:
+        os.path.abspath(self.path)
+        return self.prefix + ".exe"
 
 class TokenFile(File):
 
@@ -626,3 +644,20 @@ class Task:
             )
         # self.tests.append(new)
         return new
+
+    def create_symlinks(self):
+        target = conf.working_dir()
+        paths.remove_symlink(target)
+        os.symlink(self.dir(), target)
+
+    def remove_symlinks(self):
+        target = conf.working_dir()
+        if not os.path.exists(target):
+            return
+        try:
+            if os.path.islink(target):
+                os.unlink(target)  # TODO
+            else:
+                shutil.rmtree(target)
+        except Exception as e:
+            logger.error(e)

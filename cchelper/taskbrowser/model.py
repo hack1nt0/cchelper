@@ -104,7 +104,7 @@ class TaskModel(QAbstractTableModel):
         return ret
 
 
-    def row(self) -> Task:
+    def row(self) -> Task | None:
         return self.dats[self.offset] if self.rowCount() else None
 
     def refresh(self):

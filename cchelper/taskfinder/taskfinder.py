@@ -21,6 +21,8 @@ class TaskFinder(QDialog, Ui_TaskFinder):
         self.statusComboBox.addItem('*')
         for ts in TS:
             self.statusComboBox.addItem(ts.value)
+        if condition.status is not None:
+            self.statusComboBox.setCurrentText(condition.status.value)
             
         self.reset()
 
@@ -58,36 +60,3 @@ class TaskFinder(QDialog, Ui_TaskFinder):
         self.tagsComboBox.setCurrentIndex(0)
         self.cTimeLEdit.setDate(QDate.currentDate().addYears(-1))
         self.cTimeREdit.setDate(QDate.currentDate().addDays(1))
-
-
-def compare(e, q):
-    if q is None:
-        return True
-    ok = True
-    for k in ["tags"]:
-        ev, qv = getattr(e, k), q[k]
-        ok &= (ev & qv) == qv
-        if not ok:
-            return False
-    for k in ["level"]:
-        ev, qv = getattr(e, k), q[k]
-        ok &= qv == 0 or ev == qv
-        if not ok:
-            return False
-    for k in ["solved", "interact"]:
-        ev, qv = getattr(e, k), q[k]
-        ok &= qv is None or ev == qv
-        if not ok:
-            return False
-    for k in ["contest", "problem", "url"]:
-        ev, qv = getattr(e, k), q[k]
-        ok &= not qv or qv.lower() in ev.lower()
-        if not ok:
-            return False
-    for k in ["ctime"]:
-        ev, ql, qr = getattr(e, k), q[k + "_l"], q[k + "_r"]
-        ok &= ql <= ev < qr
-        if not ok:
-            return False
-
-    return ok

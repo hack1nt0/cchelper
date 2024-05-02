@@ -71,7 +71,7 @@ class ConfForm(QWidget, Ui_ConfForm):
             self.projectEdit.setText(d.selectedFiles()[0])
 
     def pick_font(self):
-        ret, font = QFontDialog.getFont(["JetBrains Mono", "Courier New"], self)
+        ret, font = QFontDialog.getFont(["JetBrains Mono", "PT Mono", "Courier New"], self)
         if ret:
             self.fontLineEdit.setText(
                 f"{font.family()},{font.pointSize()}"

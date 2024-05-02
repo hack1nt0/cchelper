@@ -45,7 +45,7 @@ class TextEditTerminal(QPlainTextEdit):
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.setCursor(Qt.IBeamCursor)
         self.setFocusPolicy(Qt.StrongFocus)
-        font = QFont(*conf.font)
+        font = conf.font
         self.setFont(font)
         self.fm = QFontMetricsF(font)
         self.setTabStopDistance(self.fm.horizontalAdvance(" " * 4))

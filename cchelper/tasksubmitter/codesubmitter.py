@@ -10,7 +10,7 @@ class CodeSubmitter(QDialog, Ui_CodeSubmitter):
         self.setupUi(self)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
 
-        font = QFont(*conf.font)
+        font = conf.font
         for te in [self.finalTextEdit, self.ppTextEdit, self.errTextEdit]:
             te.setFont(font)
             te.setTabStopDistance(QFontMetricsF(font).horizontalAdvance(' ' * 4))
