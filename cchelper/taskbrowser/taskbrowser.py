@@ -235,8 +235,16 @@ class TaskBrowser(QWidget, Ui_TaskBrowser):
                 return ret
 
             def relative(x: str, task: Task):
-                # if x.startswith('/Users/dy/cc'):
-                #     x = os.path.relpath(x, os.path.join('/Users/dy/cc', task.name))
+                # for name in (task.name, '-'.join(task.name.split('/'))):
+                #     start = x.find(name)
+                #     if start >= 0:
+                #         return x[start+len(task.name):]
+                for prefix in ('F/', 'T/', 'V/'):
+                    start = x.find(prefix)
+                    if start > 0:
+                        return x[start:]
+                if x.startswith('../'):
+                    return os.path.split(x)[-1]
                 return x
 
             solver_pattern = re.compile("^(sol|solver|solution|[a-z])$")
@@ -326,20 +334,15 @@ class TaskBrowser(QWidget, Ui_TaskBrowser):
                 self.rename_task_signal.emit()
 
     def del_task(self):
-        rows = list({idx.row() for idx in self.view.selectedIndexes()})
+        task = self.task
         if (
-            ConfirmBox(self, f"Are you sure to delete those {rows} task?").exec()
+            ConfirmBox(self, f"Are you sure to delete those {str(task)}").exec()
             == ConfirmBox.YES
         ):
-            for row in reversed(rows):
-                self.model.beginRemoveRows(QModelIndex(), row, row)
-                task = self.model.row(row)
-                shutil.rmtree(task.dir())
-                self.model.dats.pop(row)
-                self.model.endRemoveRows()
-                logger.info(f"Successfully deleted task: {task}.")
+            task.remove()
+            self.model.del_dat()
             self.view.setFocus()
-
+            logger.info(f"Successfully deleted task: {str(task)}.")
         
     def closeEvent(self, event: QCloseEvent) -> None:
         if self.ccListener:

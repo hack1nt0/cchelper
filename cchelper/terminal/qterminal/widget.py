@@ -13,7 +13,6 @@ import pyte
 import paramiko
 import tempfile
 from typing import Iterable
-import pyperclip as clipboard
 
 from .backend import BasePty, LocalPty, SshPty
 
@@ -87,7 +86,6 @@ class TerminalWidget(QWidget):
         # self.set_pty()
         # self.resize(800, 600)
 
-        self.set_font()
 
     def set_pty(
         self,
@@ -97,10 +95,11 @@ class TerminalWidget(QWidget):
             # self.killTimer(self.rtimer)
             self.backend.close()
 
-        # self.backend = SshPty()
-        # self.backend.connect("localhost", 22, "dy", "6666")
-        self.backend = LocalPty()
-        self.backend.connect()
+        self.backend = SshPty()
+        self.backend.connect("localhost", 22, "dy", "6666")
+        # self.backend = LocalPty()
+        # self.backend.connect()
+        self.set_font()
         self._resize()
 
         self.ptimer = self.startTimer(100)
@@ -213,7 +212,7 @@ class TerminalWidget(QWidget):
         def drawText(text: str, fg: str, bg: str, x: int, y: int):
             if not text:
                 return 0
-            # print(text, fg, bg, x, y)
+            print(text, fg, bg, x, y)
             w = self.fm.horizontalAdvance(text)
             # w = self.fontMetrics().boundingRect(text).width()
             box = QRectF(x, y, w, self.CH)
@@ -354,4 +353,5 @@ class TerminalWidget(QWidget):
 
     def closeEvent(self, event: QCloseEvent) -> None:
         self.backend.close()
+        self.read_thread.terminate()
         return super().closeEvent(event)

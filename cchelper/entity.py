@@ -139,11 +139,16 @@ for _ in range(n):
     def _project_dir(self, *args) -> str:
         return os.path.join(self.project_dir, *map(str, args))
 
+
     def tasks_dir(self, *args) -> str:
         return self._project_dir("tasks", *args)
 
     def working_dir(self, *args) -> str:
         return self._project_dir("current", *args)
+        
+    @property
+    def include_dir(self) -> str:
+        return self._project_dir("include")
 
     @property
     def solver(self) -> str:
@@ -375,17 +380,23 @@ class File:
     def compile_cmd(self) -> str:
         # TODO -it : ERR the input device is not a TTY
         # ret = f"docker exec dev bash compile{self.suffix}.sh /code/tasks/{self.taskname} {self.path} {self.executable} {1 if conf.build_debug else 0}"
+
         ret = None
+        import sys
+        import pathlib
+        _WIN = sys.platform == 'win32'
+        include_dir = conf.include_dir
+        if _WIN:
+            drive, rest = os.path.splitdrive(include_dir)
+            include_dir = pathlib.Path(f"/mnt/{drive[:-1].lower()}{rest}").as_posix()
         match self.suffix:
             case '.cpp':
                 if conf.build_debug:
-                    ret = f"c++ -I/code/include -std=c++17 -g -Wall -DDEBUG -fsanitize=address -fsanitize=undefined -o {self.executable} {self.path}"
+                    ret = f"c++ -I{include_dir} -std=c++17 -g -Wall -DDEBUG -fsanitize=address -fsanitize=undefined -o {self.executable} {self.path}"
                 else:
-                    ret = f"c++ -I/code/include -std=c++17 -O2 -o {self.executable} {self.path}"
-        if ret:
-            import sys
-            if sys.platform == 'win32':
-                ret = f"wsl {ret}"
+                    ret = f"c++ -I{include_dir} -std=c++17 -O2 -o {self.executable} {self.path}"
+        if ret and _WIN:
+            ret = f"wsl {ret}"
         return ret
 
     @property
@@ -600,6 +611,9 @@ class Task:
         with open(self.dir("meta.pickle"), "wb") as w:
             pickle.dump(self, w)
 
+    def remove(self):
+        shutil.rmtree(conf.tasks_dir(self.name))
+
     def rename(self, newname: str) -> bool:
         newpath = os.path.join(conf.project_dir, "tasks", newname)
         if os.path.exists(newpath):
@@ -647,11 +661,10 @@ class Task:
 
     def create_symlinks(self):
         target = conf.working_dir()
-        paths.remove_symlink(target)
+        self.remove_symlinks(target)
         os.symlink(self.dir(), target)
 
-    def remove_symlinks(self):
-        target = conf.working_dir()
+    def remove_symlinks(self, target: str):
         if not os.path.exists(target):
             return
         try:

@@ -79,6 +79,7 @@ class TaskComposerM(QMainWindow, Ui_TaskComposerM):
                 if self.task is not None:
                     self.task.save()
                     self.task.remove_symlinks()
+                    os.chdir(conf.project_dir)
                 self.solveButton.setStyleSheet('')
             else:
                 if self.task is None or self.task.name != task.name:
@@ -90,6 +91,7 @@ class TaskComposerM(QMainWindow, Ui_TaskComposerM):
                     self.testBrowser.set_task(task)
                     self.verdictBrowser.set_task(task)
                     task.create_symlinks()
+                    os.chdir(conf.working_dir()) #TODO MUST reset again?
                 match task.status:
                     case TS.SOLVED:
                         self.solveButton.setStyleSheet('background-color: green')
@@ -153,20 +155,15 @@ class TaskComposerM(QMainWindow, Ui_TaskComposerM):
         ### Terminal
         windows["terminal"] = self.terminal
 
-    def chdir(self):
-        wd = conf.working_dir()
-        os.makedirs(wd, exist_ok=T)
 
     def precheck(self):
         if not conf.project_dir or not conf.font:
             self.settingD.exec()
         self.taskBrowser.find_task()
-        self.chdir()
         self.terminal.set_pty()
 
     def project_changed(self):
         self.taskBrowser.find_task()
-        self.chdir()
         self.terminal.set_pty()
 
     def font_changed(self):

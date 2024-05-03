@@ -74,11 +74,12 @@ class BasePty(object):
 class LocalPty(BasePty):
 
     def connect(self):
+        sh = 'wsl' if _WIN else os.environ.get("SHELL", "sh")
         if _WIN:
-            pass
+            self.process = winpty.PTY(100, 80)
+            self.process.spawn(sh)
         else:
             self.masterfd, self.slavefd = pty.openpty()
-            sh = 'wsl' if _WIN else os.environ.get("SHELL", "sh")
             self.process = subprocess.Popen(
                 sh,
                 shell=True,
@@ -91,16 +92,24 @@ class LocalPty(BasePty):
         self.screen.reset()
 
     def write(self, dat: bytes):
-        while len(dat):
-            nb = os.write(self.masterfd, dat)
-            dat = dat[nb:]
+        if _WIN:
+            while len(dat):
+                nb = self.process.write(dat)
+                dat = dat[nb:]
+        else:
+            while len(dat):
+                nb = os.write(self.masterfd, dat)
+                dat = dat[nb:]
 
     def read(self) -> bytes:
-        return os.read(self.masterfd, 1024)
+        if _WIN:
+            return self.process.read(1024, blocking=T) #TODO
+        else:
+            return os.read(self.masterfd, 1024)
 
     def resize(self, rows: int, cols: int):
         if _WIN:
-            pass
+            self.process.set_size(cols, rows)
         else:
             winsize = struct.pack("HHHH", rows, cols, 0, 0)
             fcntl.ioctl(self.masterfd, termios.TIOCSWINSZ, winsize)

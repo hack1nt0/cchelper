@@ -104,6 +104,19 @@ class TaskModel(QAbstractTableModel):
         return ret
 
 
+    def del_dat(self):
+        # self.beginResetModel()
+        # tot = len(self.dats)
+        # self.dats.pop(self.offset)
+        # self.spinBox.blockSignals(T)
+        # self.spinBox.setRange(1, tot - 1)
+        # self.spinBox.setSuffix(f" /{tot - 1} {self.suffix}")
+        # self.spinBox.setValue(self.offset + 1)
+        # self.spinBox.blockSignals(F)
+        # self.offset = self.spinBox.value() - 1
+        # self.endResetModel()
+        pass
+
     def row(self) -> Task | None:
         return self.dats[self.offset] if self.rowCount() else None
 
