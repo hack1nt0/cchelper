@@ -52,8 +52,8 @@ class TestParamsEditor(QDialog, Ui_TestParamsEditor):
             if d.exec():
                 new_path = d.selectedFiles()[0]
                 getattr(self.task, key).path = new_path
-                self.task.remove_symlinks()
-                self.task.create_symlinks()
+                self.task.arxiv()
+                self.task.stash()
                 self.txt_btns()
         return f
 

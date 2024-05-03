@@ -5,11 +5,14 @@ from .settings_ui import Ui_Settings
 class Settings(QDialog, Ui_Settings):
     project_changed_signal: Signal = Signal()
     font_changed_signal: Signal = Signal()
+    ssh_changed_signal: Signal = Signal()
 
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
         self.setupUi(self)
-        # self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+
+        # self.buttonBox.button(QDialogButtonBox.StandardButton.Apply).clicked.connect(self.apply)
 
     def done(self, arg__1: int) -> None:
         project = conf.project_dir
@@ -22,6 +25,10 @@ class Settings(QDialog, Ui_Settings):
         if not conf.font:
             logger.error('Please choose font!')
             return
+        if conf.darktheme:
+            windows['app'].setStyleSheet(open(paths.data("dark.css")).read())
+        else:
+            windows['app'].setStyleSheet(open(paths.data("cchelper.css")).read())
         if project != conf.project_dir:
             self.project_changed_signal.emit()
         if font != conf.font:

@@ -193,23 +193,26 @@ class GViewer(QDialog, Ui_GWidget):
 	edge [color=white];
 """
 
+        # self.refresh()
+        self.svg_item: QGraphicsSvgItem = None
+
     @property
     def L(self):
         return [
             action.text() for action in self.l_menu.actions() if action.isChecked()
         ][0]
-    
+
     @property
     def source(self) -> File:
-        ret = File(f"{self.spinBox.value()}.dot")
-        if not os.path.exists(ret.path):
-            with open(ret.path, 'w') as w:
+        path = conf._project_dir(f"{self.spinBox.value()}.dot")
+        if not os.path.exists(path):
+            with open(path, "w") as w:
                 w.write(f"digraph {{{self.DEFAULT_COLOR}}}")
-        return ret
+        return File(path)
 
     def set_file(self, source: str | File):
         self.show()  # TODO
-        self.source = source if isinstance(source, File) else File(source)
+        source = source if isinstance(source, File) else File(source)
         dots = []
         buf = []
         with open(self.source.path) as r:
@@ -240,12 +243,12 @@ class GViewer(QDialog, Ui_GWidget):
         self.refresh()
 
     def refresh(self):
-        target = os.path.splitext(self.source.path)[0] + ".json"
+        target = f"{self.source.prefix}.json"
         try:
             # gv.render(
             #     engine=self.L, filepath=self.source, format="json", outfile=target
             # )
-            cmd = f"docker exec dev dot -Tjson -K{self.L} -o {target} {self.source.path}",
+            cmd = f"{'wsl ' if entity._WIN else ''}dot -Tjson -K{self.L} -o {target} {self.source.path}"
             subprocess.run(
                 cmd,
                 shell=T,
@@ -258,7 +261,6 @@ class GViewer(QDialog, Ui_GWidget):
             return
 
         # self.gitems.clear()
-        target = os.path.join(conf.project_dir, target)
         with open(target) as r:
             dat = json.load(r)
         try:
@@ -267,15 +269,14 @@ class GViewer(QDialog, Ui_GWidget):
             logger.error("Dot extract ERROR")
             logger.exception(e)
 
-        target = os.path.splitext(self.source.path)[0] + ".svg"
-        cmd = f"docker exec dev dot -Tsvg -K{self.L} -o {target} {self.source.path}",
+        target = f"{self.source.prefix}.svg"
+        cmd = f"{'wsl ' if entity._WIN else ''}dot -Tsvg -K{self.L} -o {target} {self.source.path}"
         subprocess.run(
             cmd,
             shell=T,
             stderr=PIPE,
             check=T,
         )
-        target = os.path.join(conf.project_dir, target)
         self.svg_item = QGraphicsSvgItem(target)
 
         self.view.setItem(self.svg_item)
@@ -325,6 +326,9 @@ class GViewer(QDialog, Ui_GWidget):
         # self.view.setTransform(QTransform(1, 0, 0, 1, 0, 0), combine=False)
 
     def save_png(self):
+        if self.svg_item is None:
+            logger.error("Please edit/Save dot file first!")
+            return
         image = QImage(
             self.svg_item.boundingRect().size().toSize(), QImage.Format.Format_ARGB32
         )
@@ -340,7 +344,6 @@ class GViewer(QDialog, Ui_GWidget):
         )
         image.save(self.png_fn)
         logger.info(f"Saved as {self.png_fn}")
-
 
     def edit_dot(self):
         d = CodeEditorD(self)

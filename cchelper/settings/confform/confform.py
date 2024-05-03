@@ -55,6 +55,7 @@ class ConfForm(QWidget, Ui_ConfForm):
         self.mapper.addMapping(self.fontLineEdit, self.model.cols.index("font"))
         self.fontLineEdit.setReadOnly(T)
         self.fontButton.clicked.connect(self.pick_font)
+        self.mapper.addMapping(self.darkthemeCheckBox, self.model.cols.index("darktheme"))
         self.mapper.toFirst()
 
         # self.buttonBox.button(QDialogButtonBox.StandardButton.Reset).clicked.connect(self.mapper.revert)

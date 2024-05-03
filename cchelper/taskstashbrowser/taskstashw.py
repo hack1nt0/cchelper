@@ -172,10 +172,10 @@ class TaskStashW(QMainWindow, Ui_TaskStashW):
     def setting(self):
         d = ConfForm(self)
         if self.task:
-            self.task.remove_symlinks()
+            self.task.arxiv()
         d.exec()
         if self.task:
-            self.task.create_symlinks()
+            self.task.stash()
 
     def find_task(self):
         d = TaskFinder(self)
@@ -244,7 +244,7 @@ class TaskStashW(QMainWindow, Ui_TaskStashW):
             self.VBrowser.clear()
             logger.info("No tasks found.")
             return
-        self.task.create_symlinks()
+        self.task.stash()
         self.SEditor.set_file(self.task.solver)
         self.GEditor.set_file(self.task.generator)
         self.JEditor.set_file(self.task.jurger)
@@ -262,7 +262,7 @@ class TaskStashW(QMainWindow, Ui_TaskStashW):
             for w in self.all_btns:
                 w.setEnabled(F)
             self.task.arxiv()
-            self.task.remove_symlinks()
+            self.task.arxiv()
             shutil.rmtree(self.task.stash_dir())
             self.refresh_tasks()
             self.arxiv_task_signal.emit()
@@ -369,7 +369,7 @@ class TaskStashW(QMainWindow, Ui_TaskStashW):
             task_name = self.task.name
             for w in self.all_btns:
                 w.setEnabled(F)
-            self.task.remove_symlinks()
+            self.task.arxiv()
             shutil.rmtree(self.task.stash_dir())
             self.refresh_tasks()
             logger.info(f"Successfully deleted task: {task_name}.")

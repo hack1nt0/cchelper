@@ -51,14 +51,10 @@ class TaskComposerM(QMainWindow, Ui_TaskComposerM):
         self.helpButton.setIcon(QIcon(paths.img("question.png")))
 
         ### SETTING
-        self.settingD = Settings(self)
-        self.settingD.font_changed_signal.connect(self.font_changed)
-        self.settingD.project_changed_signal.connect(self.project_changed)
-        self.settingD.hide()
         self.settingButton.setToolTip("Settings/Tools (Ctrl+,)")
         self.settingButton.setShortcut("Ctrl+,")
         self.settingButton.setIcon(QIcon(paths.img("setting.png")))
-        self.settingButton.clicked.connect(self.settingD.exec)
+        self.settingButton.clicked.connect(self.settings)
 
         self.helpButton.clicked.connect(
             lambda: QDesktopServices.openUrl(
@@ -78,9 +74,9 @@ class TaskComposerM(QMainWindow, Ui_TaskComposerM):
                 self.taskBrowser.setEnabled(T)
                 if self.task is not None:
                     self.task.save()
-                    self.task.remove_symlinks()
-                    os.chdir(conf.project_dir)
-                self.solveButton.setStyleSheet('')
+                    self.task.arxiv()
+                os.chdir(conf.project_dir)
+                self.solveButton.setStyleSheet("")
             else:
                 if self.task is None or self.task.name != task.name:
                     self.setWindowTitle(os.path.basename(task.name))
@@ -90,19 +86,21 @@ class TaskComposerM(QMainWindow, Ui_TaskComposerM):
                         w.setEnabled(T)
                     self.testBrowser.set_task(task)
                     self.verdictBrowser.set_task(task)
-                    task.create_symlinks()
-                    os.chdir(conf.working_dir()) #TODO MUST reset again?
+                    if self.task is not None:
+                        self.task.arxiv()
+                    task.stash()
+                    os.chdir(conf.working_dir())  # TODO MUST reset again?
                 match task.status:
                     case TS.SOLVED:
-                        self.solveButton.setStyleSheet('background-color: green')
+                        self.solveButton.setStyleSheet("background-color: green")
                     case TS.UNSOLVED:
-                        self.solveButton.setStyleSheet('background-color: red')
+                        self.solveButton.setStyleSheet("background-color: red")
                     case TS.UNSURE:
-                        self.solveButton.setStyleSheet('')
+                        self.solveButton.setStyleSheet("")
             if self.task is not None:
                 self.task.save()
             self.task = task
-        
+
         def task_renamed():
             self.setWindowTitle(os.path.basename(self.task.name))
             self.terminal.new_shell(self.task.dir())
@@ -153,21 +151,27 @@ class TaskComposerM(QMainWindow, Ui_TaskComposerM):
         self.verdictBrowser.view_graph_signal.connect(self.graphViewer.set_file)
 
         ### Terminal
-        windows["terminal"] = self.terminal
 
+    def settings(self):
+        d = Settings(self)
 
-    def precheck(self):
-        if not conf.project_dir or not conf.font:
-            self.settingD.exec()
-        self.taskBrowser.find_task()
-        self.terminal.set_pty()
+        def change_project():
+            self.taskBrowser.find_task()
+            self.terminal.set_pty()
 
-    def project_changed(self):
-        self.taskBrowser.find_task()
-        self.terminal.set_pty()
+        def change_font():
+            self.terminal.set_font()
 
-    def font_changed(self):
-        self.terminal.set_font()
+        def change_ssh():
+            pass
+
+        d.font_changed_signal.connect(change_font)
+        d.project_changed_signal.connect(change_project)
+        d.ssh_changed_signal.connect(change_ssh)
+        d.exec()
+        if "terminal" not in windows: #First launch
+            change_project()
+            windows["terminal"] = self.terminal
 
     def set_model(self, model, idx):
         self.model = model
@@ -266,7 +270,8 @@ class TaskComposerM(QMainWindow, Ui_TaskComposerM):
     def closeEvent(self, event: QCloseEvent) -> None:
         if self.task:
             self.task.save()
-        self.taskBrowser.close() #TODO
+            self.task.arxiv()
+        self.taskBrowser.close()  # TODO
         return super().closeEvent(event)
 
     # def open_console(self):

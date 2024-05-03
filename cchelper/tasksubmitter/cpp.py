@@ -26,8 +26,6 @@ def preprocess(
     #     PP_CMD.append(f"-I{I}")
     # PP_CMD += ["-E", "-x", "c++", "-"]
     # logger.debug(' '.join(PP_CMD))
-    PP_CMD = "docker exec -i dev c++ -I/code/include -E -x c++ -"
-    PP_CMD = PP_CMD.split(' ')
     lines = []
     std_headers = {'bits/stdc++.h'}
     import re
@@ -56,7 +54,7 @@ def preprocess(
     concat(file.path)
 
     # macro substitution (aka. after preprocessing)
-    p = Popen(PP_CMD, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
+    p = Popen(file.preprocess_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True, shell=T)
     p.stdin.writelines(lines)
     p.stdin.close()
     if p.wait():

@@ -24,7 +24,7 @@ class ConfDelegate(QStyledItemDelegate):
         match col:
             case 'languages' | 'tags':
                 model.setData(index, editor.getData())
-            case 'build_debug' | 'submit_code':
+            case 'build_debug' | 'submit_code' | 'darktheme':
                 model.setData(index, editor.isChecked())
             case _:
                 super().setModelData(editor, model, index)

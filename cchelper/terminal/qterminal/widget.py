@@ -212,7 +212,7 @@ class TerminalWidget(QWidget):
         def drawText(text: str, fg: str, bg: str, x: int, y: int):
             if not text:
                 return 0
-            print(text, fg, bg, x, y)
+            # print(text, fg, bg, x, y)
             w = self.fm.horizontalAdvance(text)
             # w = self.fontMetrics().boundingRect(text).width()
             box = QRectF(x, y, w, self.CH)

@@ -24,7 +24,7 @@ class Ui_ConfForm(object):
     def setupUi(self, ConfForm):
         if not ConfForm.objectName():
             ConfForm.setObjectName(u"ConfForm")
-        ConfForm.resize(435, 372)
+        ConfForm.resize(450, 429)
         ConfForm.setWindowTitle(u"Settings")
         self.verticalLayout = QVBoxLayout(ConfForm)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -233,6 +233,16 @@ class Ui_ConfForm(object):
 
         self.formLayout_2.setLayout(10, QFormLayout.FieldRole, self.horizontalLayout_3)
 
+        self.themeLabel = QLabel(ConfForm)
+        self.themeLabel.setObjectName(u"themeLabel")
+
+        self.formLayout_2.setWidget(11, QFormLayout.LabelRole, self.themeLabel)
+
+        self.darkthemeCheckBox = QCheckBox(ConfForm)
+        self.darkthemeCheckBox.setObjectName(u"darkthemeCheckBox")
+
+        self.formLayout_2.setWidget(11, QFormLayout.FieldRole, self.darkthemeCheckBox)
+
 
         self.verticalLayout.addLayout(self.formLayout_2)
 
@@ -260,6 +270,8 @@ class Ui_ConfForm(object):
         self.parallelLabel.setText(QCoreApplication.translate("ConfForm", u"Parallels:", None))
         self.fontLabel.setText(QCoreApplication.translate("ConfForm", u"Font:", None))
         self.fontButton.setText(QCoreApplication.translate("ConfForm", u"...", None))
+        self.themeLabel.setText("")
+        self.darkthemeCheckBox.setText(QCoreApplication.translate("ConfForm", u"Dark theme", None))
         pass
     # retranslateUi
 

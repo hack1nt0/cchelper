@@ -131,10 +131,10 @@ class TaskWindow(QMainWindow, Ui_TaskWindow):
     def setting(self):
         d = ConfForm(self)
         if self.task:
-            self.task.remove_symlinks()
+            self.task.arxiv()
         d.exec()
         if self.task:
-            self.task.create_symlinks()
+            self.task.stash()
 
     def find_task(self):
         d = TaskFinder(self)
@@ -163,7 +163,7 @@ class TaskWindow(QMainWindow, Ui_TaskWindow):
             for w in self.all_btns:
                 w.setEnabled(F)
             self.task.arxiv()
-            self.task.remove_symlinks()
+            self.task.arxiv()
             shutil.rmtree(self.task.stash_dir())
             self.refresh_tasks()
             self.arxiv_task_signal.emit()
@@ -271,7 +271,7 @@ class TaskWindow(QMainWindow, Ui_TaskWindow):
             task_name = self.task.name
             for w in self.all_btns:
                 w.setEnabled(F)
-            self.task.remove_symlinks()
+            self.task.arxiv()
             shutil.rmtree(self.task.stash_dir())
             self.refresh_tasks()
             logger.info(f"Successfully deleted task: {task_name}.")

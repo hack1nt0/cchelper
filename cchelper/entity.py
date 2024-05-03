@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 import time
 import enum
 import os
+
 # from .db import db
 from typing import List, Tuple, Dict, Any
 import json
@@ -19,6 +20,12 @@ from PySide6.QtGui import QFont
 T, F = True, False
 import cchelper.paths as paths
 from .logger import logger
+
+import sys
+import pathlib
+import typing
+
+_WIN = sys.platform == "win32"
 
 __all__ = [
     "Language",
@@ -125,6 +132,7 @@ for _ in range(n):
             "exe_dump_delay": 1,
             "exe_warm_delay": 2,
             "font": None,
+            "darktheme": False,
         }
         self.save()
 
@@ -139,16 +147,19 @@ for _ in range(n):
     def _project_dir(self, *args) -> str:
         return os.path.join(self.project_dir, *map(str, args))
 
-
     def tasks_dir(self, *args) -> str:
         return self._project_dir("tasks", *args)
 
     def working_dir(self, *args) -> str:
         return self._project_dir("current", *args)
-        
+
     @property
     def include_dir(self) -> str:
-        return self._project_dir("include")
+        ret = self._project_dir("include")
+        if _WIN:
+            drive, rest = os.path.splitdrive(ret)
+            ret = pathlib.Path(f"/mnt/{drive[:-1].lower()}{rest}").as_posix()
+        return ret
 
     @property
     def solver(self) -> str:
@@ -244,15 +255,14 @@ for _ in range(n):
 
     @property
     def font(self) -> QFont | None:
-        if self.dat['font']:
-            f, s = self.dat['font'].split(',')
+        if self.dat["font"]:
+            f, s = self.dat["font"].split(",")
             return QFont(f, int(s))
         return None
 
     @property
-    def graphviz(self) -> str:
-        return self.dat.get("graphviz")
-
+    def darktheme(self) -> bool:
+        return self.dat["darktheme"]
 
 conf = Configuration()
 
@@ -273,15 +283,15 @@ class File:
             with open(self.path, "w") as w:
                 pass
         return self
-    
+
     def write(self, o):
         if isinstance(o, File):
-            with open(self.path, 'w') as w:
+            with open(self.path, "w") as w:
                 for line in open(o):
                     w.write(line)
         else:
             assert isinstance(o, str)
-            with open(self.path, 'w') as w:
+            with open(self.path, "w") as w:
                 w.write(o)
 
     def __iadd__(self, value: bytes | str):
@@ -380,24 +390,16 @@ class File:
     def compile_cmd(self) -> str:
         # TODO -it : ERR the input device is not a TTY
         # ret = f"docker exec dev bash compile{self.suffix}.sh /code/tasks/{self.taskname} {self.path} {self.executable} {1 if conf.build_debug else 0}"
-
         ret = None
-        import sys
-        import pathlib
-        _WIN = sys.platform == 'win32'
-        include_dir = conf.include_dir
-        if _WIN:
-            drive, rest = os.path.splitdrive(include_dir)
-            include_dir = pathlib.Path(f"/mnt/{drive[:-1].lower()}{rest}").as_posix()
         match self.suffix:
-            case '.cpp':
+            case ".cpp":
                 if conf.build_debug:
-                    ret = f"c++ -I{include_dir} -std=c++17 -g -Wall -DDEBUG -fsanitize=address -fsanitize=undefined -o {self.executable} {self.path}"
+                    ret = f"c++ -I{conf.include_dir} -std=c++17 -g -Wall -DDEBUG -fsanitize=address -fsanitize=undefined -o {self.executable} {self.path}"
                 else:
-                    ret = f"c++ -I{include_dir} -std=c++17 -O2 -o {self.executable} {self.path}"
+                    ret = f"c++ -I{conf.include_dir} -std=c++17 -O2 -o {self.executable} {self.path}"
         if ret and _WIN:
             ret = f"wsl {ret}"
-        return ret
+        return self.format_cmd(ret)
 
     @property
     def execute_cmd(self) -> str:
@@ -407,16 +409,26 @@ class File:
                 ret = f"./{self.executable}"
             case ".py":
                 ret = f"python3 {self.path}"
-        if ret:
-            import sys
-            if sys.platform == 'win32':
-                ret = f"wsl {ret}"
-        return ret
+        if ret and _WIN:
+            ret = f"wsl {ret}"
+        return self.format_cmd(ret)
+
+    @property
+    def preprocess_cmd(self) -> str:
+        ret = None
+        match self.suffix:
+            case ".cpp":
+                ret = f"c++ -I{conf.include_dir} -E -x c++ -"
+        if ret and _WIN:
+            ret = f"wsl {ret}"
+        return self.format_cmd(ret)
 
     def format_cmd(self, cmd: str) -> str | List[str] | None:
         if cmd is None:
             return
-        return cmd if conf.run_inshell else cmd.split(" ")  # TODO
+        import shlex
+
+        return cmd if conf.run_inshell else shlex.split(cmd)  # TODO
 
     @property
     def executable(self) -> str:
@@ -430,6 +442,7 @@ class File:
     def path_wsl(self) -> str:
         os.path.abspath(self.path)
         return self.prefix + ".exe"
+
 
 class TokenFile(File):
 
@@ -636,16 +649,20 @@ class Task:
                 answer_type=old.answer_type,
             )
             if isinstance(old.input, File):
-                new.input = File(self.test_dir(id, os.path.basename(old.input.path))).create()
+                new.input = File(
+                    self.test_dir(id, os.path.basename(old.input.path))
+                ).create()
                 new.input.write(old.input)
             if isinstance(old.input, str):
-                new.input = File(self.test_dir(id, 'Input.txt')).create()
+                new.input = File(self.test_dir(id, "Input.txt")).create()
                 new.input.write(old.input)
             if isinstance(old.answer, File):
-                new.answer = File(self.test_dir(id, os.path.basename(old.answer.path))).create()
+                new.answer = File(
+                    self.test_dir(id, os.path.basename(old.answer.path))
+                ).create()
                 new.answer.write(old.answer)
             if isinstance(old.answer, str):
-                new.answer = File(self.test_dir(id, 'Answer.txt')).create()
+                new.answer = File(self.test_dir(id, "Answer.txt")).create()
                 new.answer.write(old.answer)
         else:
             new = Test(
@@ -653,24 +670,24 @@ class Task:
                 status=VS.QUE,
                 input_type=IT.MANUAL,
                 answer_type=IT.MANUAL,
-                input=File(self.test_dir(id, 'Input.txt')).create(),
-                answer=File(self.test_dir(id, 'Answer.txt')).create(),
+                input=File(self.test_dir(id, "Input.txt")).create(),
+                answer=File(self.test_dir(id, "Answer.txt")).create(),
             )
         # self.tests.append(new)
         return new
 
-    def create_symlinks(self):
-        target = conf.working_dir()
-        self.remove_symlinks(target)
-        os.symlink(self.dir(), target)
+    def stash(self):
+        self.arxiv()
+        os.symlink(self.dir(), conf.working_dir())
 
-    def remove_symlinks(self, target: str):
+    def arxiv(self):
+        target = conf.working_dir()
         if not os.path.exists(target):
             return
         try:
-            if os.path.islink(target):
-                os.unlink(target)  # TODO
-            else:
+            os.unlink(target)  # TODO
+        except:
+            try:
                 shutil.rmtree(target)
-        except Exception as e:
-            logger.error(e)
+            except:
+                os.remove(target)

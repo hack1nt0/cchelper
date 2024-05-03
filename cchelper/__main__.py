@@ -20,17 +20,17 @@ class App(QApplication):
         finally:
             return F
 
-
 if __name__ == "__main__":
     app = App()
 
-    with open(paths.data("cchelper.css"), "r") as r:
-        app.setStyleSheet(r.read())
+    windows['app'] = app
+
+    print('STYLE'.center(100, '-'), '\n', app.styleSheet())
 
     c = TaskComposerM()
-    app.paletteChanged.connect(c.set_color)
+    app.paletteChanged.connect(c.set_color) #TODO
     c.show()
-    c.precheck()
+    c.settings()
 
     # b.setting()
     # os.chdir(conf.project_dir) #TODO
